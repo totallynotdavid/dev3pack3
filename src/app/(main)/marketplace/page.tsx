@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { ContractsList } from "./contracts-list";
 import { SentinelHero } from "@/ui/components/marketplace/sentinel-hero";
+import { Chatbot } from "@/ui/components/marketplace/chatbot";
 
 export const metadata = {
   title: "Sentinel — Better Investment Decisions",
@@ -10,8 +11,8 @@ export const metadata = {
 
 function ContractsLoadingSkeleton() {
   return (
-    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-      {Array.from({ length: 6 }).map((_, i) => (
+    <div className="grid gap-6 grid-cols-1 sm:grid-cols-2">
+      {Array.from({ length: 4 }).map((_, i) => (
         <div
           key={i}
           className="h-[260px] animate-pulse rounded-lg border border-border bg-card"
@@ -60,9 +61,18 @@ export default function MarketplacePage() {
             </div>
           </div>
 
-          <Suspense fallback={<ContractsLoadingSkeleton />}>
-            <ContractsList />
-          </Suspense>
+          <div className="flex items-start gap-8 xl:gap-12">
+            <div className="min-w-0 flex-1">
+              <Suspense fallback={<ContractsLoadingSkeleton />}>
+                <ContractsList />
+              </Suspense>
+            </div>
+            <aside className="hidden lg:block w-[360px] xl:w-[400px] flex-shrink-0">
+              <div className="sticky top-8">
+                <Chatbot />
+              </div>
+            </aside>
+          </div>
         </div>
       </section>
     </>

@@ -21,7 +21,7 @@ export async function ContractsList() {
   }
 
   return (
-    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+    <div className="grid gap-6 grid-cols-2 sm:grid-cols-2">
       {contracts.map((contract) => (
         <ContractCard key={contract.id} contract={contract} />
       ))}
