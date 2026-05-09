@@ -1,0 +1,44 @@
+import Link from "next/link";
+import { type Contract } from "@/lib/db";
+import { formatMoney } from "@/lib/utils";
+import { RiskBadge } from "./risk-badge";
+import { ContractStatusBadge } from "./contract-status-badge";
+
+interface ContractCardProps {
+	contract: Contract;
+}
+
+export function ContractCard({ contract }: ContractCardProps) {
+	const daysUntilDue = Math.floor(
+		(new Date(contract.due_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+	);
+
+	return (
+		<Link href={`/marketplace/${contract.id}`}>
+			<div className="rounded-lg border border-border bg-card p-6 transition hover:shadow-lg">
+				<div className="mb-4 flex items-start justify-between">
+					<div className="flex-1">
+						<h3 className="text-lg font-semibold">{contract.debtor_name}</h3>
+						<p className="text-sm text-muted-foreground">{contract.currency}</p>
+					</div>
+					<ContractStatusBadge status={contract.status} />
+				</div>
+
+				<div className="mb-4 space-y-2">
+					<div className="flex justify-between">
+						<span className="text-sm text-muted-foreground">Face Value</span>
+						<span className="font-semibold">{formatMoney(contract.face_value / 100)}</span>
+					</div>
+					<div className="flex justify-between">
+						<span className="text-sm text-muted-foreground">Due in</span>
+						<span className="font-semibold">{daysUntilDue} days</span>
+					</div>
+				</div>
+
+				<div className="flex items-center gap-2">
+					<RiskBadge risk={contract.risk_category} />
+				</div>
+			</div>
+		</Link>
+	);
+}
