@@ -6,7 +6,7 @@ import { Button } from "@/ui/components/ui/button";
 import { Input } from "@/ui/components/ui/input";
 import { Label } from "@/ui/components/ui/label";
 
-type RiskCategory = "low" | "medium" | "high";
+import { type RiskCategory } from "@/db/schema";
 
 export function ContractForm() {
   const router = useRouter();

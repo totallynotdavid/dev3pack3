@@ -1,15 +1,18 @@
 import { forwardRef, type ButtonHTMLAttributes } from "react";
+import { Slot } from "@radix-ui/react-slot";
 import { cn } from "@/lib/utils";
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "default" | "secondary" | "outline-solid" | "ghost" | "destructive";
+  variant?: "default" | "secondary" | "outline-solid" | "outline" | "ghost" | "destructive";
   size?: "default" | "sm" | "lg" | "icon";
+  asChild?: boolean;
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant = "default", size = "default", ...props }, ref) => {
+  ({ className, variant = "default", size = "default", asChild = false, ...props }, ref) => {
+    const Comp = asChild ? Slot : "button";
     return (
-      <button
+      <Comp
         ref={ref}
         className={cn(
           // Base styles
@@ -26,7 +29,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
               variant === "default",
             "hover:bg-secondary/80 bg-secondary text-secondary-foreground": variant === "secondary",
             "shadow-xs border border-input bg-background hover:bg-accent hover:text-accent-foreground":
-              variant === "outline-solid",
+              variant === "outline-solid" || variant === "outline",
             "hover:bg-accent hover:text-accent-foreground": variant === "ghost",
             "hover:bg-destructive/90 shadow-xs bg-destructive text-destructive-foreground":
               variant === "destructive",

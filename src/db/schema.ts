@@ -1,5 +1,10 @@
 import { pgTable, text, bigint, uuid, date, timestamp, varchar, index } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
+import { relations, type InferSelectModel } from "drizzle-orm";
+
+export type ContractStatus = "active" | "under_negotiation" | "sold" | "expired" | "cancelled";
+export type OfferStatus = "pending" | "countered" | "accepted" | "rejected" | "expired" | "withdrawn";
+export type RiskCategory = "low" | "medium" | "high";
+export type TransactionType = "deposit" | "hold" | "release" | "settle" | "withdraw";
 
 export const users = pgTable("users", {
   id: text("id").primaryKey(),
@@ -21,8 +26,8 @@ export const contracts = pgTable(
     currency: varchar("currency", { length: 3 }).notNull().default("USD"),
     dueDate: date("due_date", { mode: "date" }).notNull(),
     documentUrl: text("document_url"),
-    riskCategory: varchar("risk_category", { length: 10 }).notNull(),
-    status: varchar("status", { length: 20 }).notNull().default("active"),
+    riskCategory: varchar("risk_category", { length: 10 }).notNull().$type<RiskCategory>(),
+    status: varchar("status", { length: 20 }).notNull().default("active").$type<ContractStatus>(),
     negotiationDeadline: timestamp("negotiation_deadline", {
       withTimezone: true,
     }),
@@ -48,7 +53,7 @@ export const offers = pgTable(
     amount: bigint("amount", { mode: "number" }).notNull(),
     currency: varchar("currency", { length: 3 }).notNull().default("USD"),
     counterAmount: bigint("counter_amount", { mode: "number" }),
-    status: varchar("status", { length: 20 }).notNull().default("pending"),
+    status: varchar("status", { length: 20 }).notNull().default("pending").$type<OfferStatus>(),
     expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
@@ -67,7 +72,7 @@ export const walletTransactions = pgTable(
       .notNull()
       .references(() => users.id),
     amount: bigint("amount", { mode: "number" }).notNull(),
-    type: varchar("type", { length: 20 }).notNull(),
+    type: varchar("type", { length: 20 }).notNull().$type<TransactionType>(),
     offerId: uuid("offer_id").references(() => offers.id),
     stripePaymentIntentId: text("stripe_payment_intent_id"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
@@ -114,3 +119,9 @@ export const walletTransactionsRelations = relations(walletTransactions, ({ one 
     references: [offers.id],
   }),
 }));
+
+// Row types
+export type User = InferSelectModel<typeof users>;
+export type Contract = InferSelectModel<typeof contracts>;
+export type Offer = InferSelectModel<typeof offers>;
+export type WalletTransaction = InferSelectModel<typeof walletTransactions>;

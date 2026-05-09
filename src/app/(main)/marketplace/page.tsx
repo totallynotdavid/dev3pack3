@@ -5,10 +5,7 @@ function ContractsLoadingSkeleton() {
   return (
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
       {Array.from({ length: 6 }).map((_, i) => (
-        <div
-          key={i}
-          className="h-64 animate-pulse rounded-lg bg-muted"
-        />
+        <div key={i} className="h-64 animate-pulse rounded-lg bg-muted" />
       ))}
     </div>
   );

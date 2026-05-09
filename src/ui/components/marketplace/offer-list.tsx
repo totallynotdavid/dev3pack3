@@ -1,4 +1,4 @@
-import { type Offer } from "@/lib/db";
+import { type Offer } from "@/db/schema";
 import { formatMoney } from "@/lib/utils";
 import { OfferStatusBadge } from "./offer-status-badge";
 

@@ -1,5 +1,5 @@
 import { Badge } from "@/ui/components/ui/badge";
-import { type OfferStatus } from "@/lib/db";
+import { type OfferStatus } from "@/db/schema";
 
 interface OfferStatusBadgeProps {
   status: OfferStatus;

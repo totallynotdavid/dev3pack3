@@ -1,11 +1,11 @@
 import { db } from "@/db";
-import { walletTransactions } from "@/db/schema";
+import { walletTransactions, type TransactionType } from "@/db/schema";
 import { eq, desc } from "drizzle-orm";
 
 export async function createTransaction(
   userId: string,
   amount: number,
-  type: string,
+  type: TransactionType,
   offerId?: string | null,
   stripePaymentIntentId?: string | null,
 ) {

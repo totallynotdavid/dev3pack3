@@ -1,21 +1,27 @@
 import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
-import sql from "@/lib/db";
-import { type User, type Contract, type Offer } from "@/lib/db";
+import { db } from "@/db";
+import { users, contracts, offers } from "@/db/schema";
+import { eq, desc } from "drizzle-orm";
 import { Button } from "@/ui/components/ui/button";
 import { formatMoney } from "@/lib/utils";
 
 async function getUserData(userId: string) {
-  const users = await sql<User[]>`SELECT * FROM users WHERE id = ${userId}`;
-  const user = users[0];
+  const [user] = await db.select().from(users).where(eq(users.id, userId));
 
-  const myContracts = await sql<Contract[]>`
-    SELECT * FROM contracts WHERE seller_id = ${userId} ORDER BY created_at DESC LIMIT 5
-  `;
+  const myContracts = await db
+    .select()
+    .from(contracts)
+    .where(eq(contracts.sellerId, userId))
+    .orderBy(desc(contracts.createdAt))
+    .limit(5);
 
-  const myOffers = await sql<Offer[]>`
-    SELECT * FROM offers WHERE buyer_id = ${userId} ORDER BY created_at DESC LIMIT 5
-  `;
+  const myOffers = await db
+    .select()
+    .from(offers)
+    .where(eq(offers.buyerId, userId))
+    .orderBy(desc(offers.createdAt))
+    .limit(5);
 
   return { user, myContracts, myOffers };
 }
@@ -31,7 +37,7 @@ export default async function DashboardPage() {
       <div className="mb-8">
         <h1 className="text-4xl font-bold">Dashboard</h1>
         <p className="mt-2 text-lg text-muted-foreground">
-          Welcome back, {user.full_name || "User"}!
+          Welcome back, {user.fullName || "User"}!
         </p>
       </div>
 
@@ -40,7 +46,7 @@ export default async function DashboardPage() {
         <div className="grid gap-4 md:grid-cols-3">
           <div>
             <p className="text-sm text-muted-foreground">Wallet Balance</p>
-            <p className="text-3xl font-bold">{formatMoney(user.wallet_balance / 100)}</p>
+            <p className="text-3xl font-bold">{formatMoney(user.walletBalance / 100)}</p>
           </div>
           <div className="flex items-end">
             <Button asChild>
@@ -67,9 +73,9 @@ export default async function DashboardPage() {
               {myContracts.map((contract) => (
                 <Link key={contract.id} href={`/marketplace/${contract.id}`}>
                   <div className="rounded border border-border/50 p-3 hover:bg-muted">
-                    <p className="font-semibold">{contract.debtor_name}</p>
+                    <p className="font-semibold">{contract.debtorName}</p>
                     <p className="text-sm text-muted-foreground">
-                      {formatMoney(contract.face_value / 100)} {contract.currency}
+                      {formatMoney(contract.faceValue / 100)} {contract.currency}
                     </p>
                   </div>
                 </Link>
@@ -95,9 +101,9 @@ export default async function DashboardPage() {
                       <p className="font-semibold">Offer: {formatMoney(offer.amount / 100)}</p>
                       <p className="text-sm text-muted-foreground capitalize">{offer.status}</p>
                     </div>
-                    {offer.counter_amount && (
+                    {offer.counterAmount && (
                       <p className="text-orange-600">
-                        Counter: {formatMoney(offer.counter_amount / 100)}
+                        Counter: {formatMoney(offer.counterAmount / 100)}
                       </p>
                     )}
                   </div>

@@ -8,11 +8,7 @@
     "rootDir": "src",
     "strict": true,
     "skipLibCheck": true,
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
@@ -27,12 +23,8 @@
       }
     ],
     "paths": {
-      "@/*": [
-        "./src/*"
-      ],
-      "@ui/*": [
-        "./src/components/*"
-      ]
+      "@/*": ["./src/*"],
+      "@ui/*": ["./src/components/*"]
     },
     "incremental": true
   },
@@ -43,7 +35,5 @@
     "next-env.d.ts",
     ".next/dev/types/**/*.ts"
   ],
-  "exclude": [
-    "node_modules"
-  ]
+  "exclude": ["node_modules"]
 }

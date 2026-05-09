@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { type Contract } from "@/lib/db";
+import { type Contract } from "@/db/schema";
 import { formatMoney } from "@/lib/utils.ts";
 import { RiskBadge } from "./risk-badge.tsx";
 import { ContractStatusBadge } from "./contract-status-badge.tsx";

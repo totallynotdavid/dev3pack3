@@ -1,5 +1,5 @@
 import { Badge } from "@/ui/components/ui/badge";
-import { type RiskCategory } from "@/lib/db";
+import { type RiskCategory } from "@/db/schema";
 
 interface RiskBadgeProps {
   risk: RiskCategory;
