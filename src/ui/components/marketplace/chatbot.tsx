@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, type KeyboardEvent, type FormEvent, type ChangeEvent } from "react";
+import { useState, useRef, type KeyboardEvent, type FormEvent, type ChangeEvent } from "react";
 import { cn } from "@/lib/utils";
 
 interface Message {
@@ -43,12 +43,8 @@ export function Chatbot() {
   const [messages, setMessages] = useState<Message[]>(INITIAL);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const bottomRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, loading]);
 
   function send(text: string) {
     if (!text.trim() || loading) return;
@@ -193,7 +189,6 @@ export function Chatbot() {
             </div>
           )}
 
-          <div ref={bottomRef} />
         </div>
       </div>
 
