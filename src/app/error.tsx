@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
-import { AlertCircle, RefreshCw, Home, ArrowLeft } from "lucide-react";
+import { Icon } from "@/ui/components/shared/icon";
 
 interface ErrorPageProps {
   error: Error & { digest?: string };
@@ -14,53 +14,60 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
     console.error("[Error]", error);
   }, [error]);
 
-  const buttonBase =
-    "inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring";
-
   return (
-    <div className="flex min-h-[50vh] flex-col items-center justify-center px-4 py-16">
-      <div className="mx-auto max-w-md text-center">
-        <div className="bg-destructive/10 mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full">
-          <AlertCircle className="h-8 w-8 text-destructive" />
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-6 py-24">
+      <div className="pointer-events-none absolute inset-0 bg-dot-grid opacity-60" />
+
+      <div className="relative mx-auto max-w-xl rounded-lg border border-border bg-card p-10 text-center shadow-soft lg:p-14">
+        <div className="mb-6 inline-flex items-center gap-3">
+          <span className="h-2.5 w-2.5 bg-destructive" aria-hidden />
+          <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+            Unexpected Error
+          </span>
         </div>
 
-        <h1 className="mb-2 text-2xl font-bold tracking-tight text-foreground">
-          Something Went Wrong
+        <h1 className="font-display text-5xl leading-[1.05] tracking-tighter text-foreground sm:text-6xl">
+          Something <span className="italic text-brand">broke</span>.
         </h1>
 
-        <p className="mb-8 text-muted-foreground">
-          An unexpected error occurred. Please try again.
+        <p className="mx-auto mt-6 max-w-md text-base leading-relaxed text-muted-foreground sm:text-lg">
+          An unexpected error occurred. Try again, or head back to a known good place.
         </p>
 
-        <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
+        <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
           <button
+            type="button"
             onClick={reset}
-            className={`${buttonBase} hover:bg-primary/90 bg-primary text-primary-foreground`}
+            className="group inline-flex items-center gap-2 rounded-md bg-foreground px-7 py-3.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-neutral-800"
           >
-            <RefreshCw className="h-4 w-4" />
-            Try Again
+            Try again
+            <Icon
+              icon="solar:arrow-right-linear"
+              className="text-lg transition-transform group-hover:translate-x-1"
+            />
           </button>
-
           <Link
             href="/marketplace"
-            className={`${buttonBase} border border-input bg-background hover:bg-accent hover:text-accent-foreground`}
+            className="inline-flex items-center gap-2 rounded-md border border-border-strong bg-card px-7 py-3.5 text-sm font-medium text-foreground shadow-sm transition-colors hover:bg-secondary"
           >
-            <Home className="h-4 w-4" />
-            Go Home
+            Go to marketplace
           </Link>
         </div>
 
         <button
+          type="button"
           onClick={() => window.history.back()}
-          className="mt-6 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+          className="mt-8 inline-flex items-center gap-1 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
         >
-          <ArrowLeft className="h-3 w-3" />
+          <Icon icon="solar:arrow-left-linear" className="text-sm" />
           Go back
         </button>
 
-        {error.digest && (
-          <p className="text-muted-foreground/60 mt-8 text-xs">Error ID: {error.digest}</p>
-        )}
+        {error.digest ? (
+          <p className="mt-8 font-mono text-[10px] uppercase tracking-widest text-muted-foreground/60">
+            Error ID · {error.digest}
+          </p>
+        ) : null}
       </div>
     </div>
   );

@@ -1,47 +1,43 @@
 import Link from "next/link";
-import { Search, Home } from "lucide-react";
+import { Icon } from "@/ui/components/shared/icon";
 
-/**
- * Global 404 page.
- *
- * Shown when a route doesn't exist.
- */
 export default function NotFound() {
-  const buttonBase =
-    "inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring";
-
   return (
-    <div className="flex min-h-[70vh] flex-col items-center justify-center px-4 py-16">
-      <div className="mx-auto max-w-md text-center">
-        {/* 404 Badge */}
-        <span className="mb-4 inline-block rounded-full bg-muted px-3 py-1 text-sm font-medium text-muted-foreground">
-          404
-        </span>
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-6 py-24">
+      <div className="pointer-events-none absolute inset-0 bg-dot-grid opacity-60" />
 
-        {/* Heading */}
-        <h1 className="mb-2 text-2xl font-bold tracking-tight text-foreground">Page Not Found</h1>
+      <div className="relative mx-auto max-w-xl rounded-lg border border-border bg-card p-10 text-center shadow-soft lg:p-14">
+        <div className="mb-6 inline-flex items-center gap-3">
+          <span className="h-2.5 w-2.5 bg-brand" aria-hidden />
+          <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+            Error 404
+          </span>
+        </div>
 
-        {/* Message */}
-        <p className="mb-8 text-muted-foreground">
+        <h1 className="font-display text-5xl leading-[1.05] tracking-tighter text-foreground sm:text-6xl">
+          Page <span className="italic text-brand">not found</span>.
+        </h1>
+
+        <p className="mx-auto mt-6 max-w-md text-base leading-relaxed text-muted-foreground sm:text-lg">
           The page you&apos;re looking for doesn&apos;t exist or has been moved.
         </p>
 
-        {/* Actions */}
-        <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
+        <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
           <Link
-            href="/"
-            className={`${buttonBase} hover:bg-primary/90 bg-primary text-primary-foreground`}
+            href="/marketplace"
+            className="group inline-flex items-center gap-2 rounded-md bg-foreground px-7 py-3.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-neutral-800"
           >
-            <Home className="h-4 w-4" />
-            Go Home
+            Go to marketplace
+            <Icon
+              icon="solar:arrow-right-linear"
+              className="text-lg transition-transform group-hover:translate-x-1"
+            />
           </Link>
-
           <Link
-            href="/products"
-            className={`${buttonBase} border border-input bg-background hover:bg-accent hover:text-accent-foreground`}
+            href="/dashboard"
+            className="inline-flex items-center gap-2 rounded-md border border-border-strong bg-card px-7 py-3.5 text-sm font-medium text-foreground shadow-sm transition-colors hover:bg-secondary"
           >
-            <Search className="h-4 w-4" />
-            Browse Products
+            Open dashboard
           </Link>
         </div>
       </div>

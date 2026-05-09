@@ -1,6 +1,5 @@
 import { ClerkProvider } from "@clerk/nextjs";
 import { Inter, Newsreader } from "next/font/google";
-import { GeistMono } from "geist/font/mono";
 import "./globals.css";
 import { type ReactNode } from "react";
 import { rootMetadata } from "@/lib/seo";
@@ -28,7 +27,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       lang="en"
       suppressHydrationWarning
       data-scroll-behavior="smooth"
-      className={`${inter.variable} ${newsreader.variable} ${GeistMono.variable} min-h-dvh`}
+      className={`${inter.variable} ${newsreader.variable} min-h-dvh`}
     >
       <ClerkProvider>
         <body className="min-h-dvh bg-background font-sans text-foreground antialiased">
