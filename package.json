@@ -9,8 +9,9 @@
     "dev:turbopack": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
-    "lint:fix": "eslint --fix",
+    "format": "oxfmt .",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
     "test": "vitest",
     "test:run": "vitest run",
     "db:push": "drizzle-kit push",
@@ -58,6 +59,8 @@
     "eslint-config-next": "16.2.4",
     "husky": "8.0.3",
     "lint-staged": "15.1.0",
+    "oxfmt": "^0.48.0",
+    "oxlint": "^1.63.0",
     "postcss": "8.5.6",
     "postcss-import": "16.1.0",
     "prettier": "3.1.1",
@@ -67,10 +70,10 @@
     "vitest": "4.0.17"
   },
   "overrides": {
-    "dset": ">=3.1.4",
-    "micromatch": ">=4.0.8",
-    "@babel/runtime": ">=7.26.10",
     "@babel/helpers": ">=7.26.10",
-    "brace-expansion@>=2": ">=2.0.2"
+    "@babel/runtime": ">=7.26.10",
+    "brace-expansion@>=2": ">=2.0.2",
+    "dset": ">=3.1.4",
+    "micromatch": ">=4.0.8"
   }
 }
