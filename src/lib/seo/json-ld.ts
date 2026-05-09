@@ -74,7 +74,7 @@ export function buildProductJsonLd(options: {
     ...(sku && { sku }),
     brand: {
       "@type": "Brand",
-      name: brand || seoConfig.defaultBrand,
+      name: brand || seoConfig.organizationName,
     },
     offers: price
       ? {
