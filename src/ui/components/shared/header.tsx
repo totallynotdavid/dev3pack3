@@ -34,7 +34,7 @@ export function Header() {
 
           <div>
             {isSignedIn ? (
-              <UserButton afterSignOutUrl="/" />
+              <UserButton />
             ) : (
               <SignInButton mode="modal">
                 <button className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90">

@@ -20,18 +20,18 @@ export function OfferList({ offers }: OfferListProps) {
             <OfferStatusBadge status={offer.status} />
           </div>
 
-          {offer.counter_amount && (
+          {offer.counterAmount && (
             <div className="mt-3 pt-3 border-t">
               <p className="text-sm text-muted-foreground">Counter Offer</p>
               <p className="text-lg font-semibold text-orange-600">
-                {formatMoney(offer.counter_amount / 100)}
+                {formatMoney(offer.counterAmount / 100)}
               </p>
             </div>
           )}
 
           <p className="mt-3 text-xs text-muted-foreground">
-            {new Date(offer.created_at).toLocaleDateString()} at{" "}
-            {new Date(offer.created_at).toLocaleTimeString()}
+            {new Date(offer.createdAt).toLocaleDateString()} at{" "}
+            {new Date(offer.createdAt).toLocaleTimeString()}
           </p>
         </div>
       ))}
