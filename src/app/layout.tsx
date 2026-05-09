@@ -27,6 +27,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html
       lang="en"
       suppressHydrationWarning
+      data-scroll-behavior="smooth"
       className={`${inter.variable} ${newsreader.variable} ${GeistMono.variable} min-h-dvh`}
     >
       <ClerkProvider>

@@ -28,11 +28,13 @@ export default function PostContractPage() {
         </div>
 
         <div className="mt-10 grid gap-4 sm:grid-cols-3">
-          {[
-            { icon: "solar:shield-check-linear", label: "Escrow Protected" },
-            { icon: "solar:graph-up-linear", label: "Risk Graded" },
-            { icon: "solar:bolt-linear", label: "Instant Settlement" },
-          ].map((item) => (
+          {(
+            [
+              { icon: "solar:shield-check-linear", label: "Escrow Protected" },
+              { icon: "solar:graph-up-linear", label: "Risk Graded" },
+              { icon: "solar:bolt-linear", label: "Instant Settlement" },
+            ] as const
+          ).map((item) => (
             <div
               key={item.label}
               className="flex items-center gap-3 rounded-md border border-border bg-card px-5 py-4 shadow-sm"
