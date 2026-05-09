@@ -1,19 +1,19 @@
 import { auth } from "@clerk/nextjs/server";
-import sql from "@/lib/db";
-import { type User, type WalletTransaction } from "@/lib/db";
+import { db } from "@/db";
+import { users, walletTransactions } from "@/db/schema";
+import { eq, desc } from "drizzle-orm";
 import { WalletBalance } from "@/ui/components/marketplace/wallet-balance";
 import { formatMoney } from "@/lib/utils";
 
 async function getWalletData(userId: string) {
-  const users = await sql<User[]>`SELECT * FROM users WHERE id = ${userId}`;
-  const user = users[0];
+  const [user] = await db.select().from(users).where(eq(users.id, userId));
 
-  const transactions = await sql<WalletTransaction[]>`
-    SELECT * FROM wallet_transactions
-    WHERE user_id = ${userId}
-    ORDER BY created_at DESC
-    LIMIT 20
-  `;
+  const transactions = await db
+    .select()
+    .from(walletTransactions)
+    .where(eq(walletTransactions.userId, userId))
+    .orderBy(desc(walletTransactions.createdAt))
+    .limit(20);
 
   return { user, transactions };
 }
@@ -32,7 +32,7 @@ export default async function WalletPage() {
       <div className="mb-8 rounded-lg border border-border bg-card p-6">
         <div className="mb-6">
           <p className="text-sm text-muted-foreground">Current Balance</p>
-          <p className="text-4xl font-bold">{formatMoney(user.wallet_balance / 100)}</p>
+          <p className="text-4xl font-bold">{formatMoney(user.walletBalance / 100)}</p>
         </div>
         <WalletBalance />
       </div>
@@ -53,7 +53,7 @@ export default async function WalletPage() {
                 <div>
                   <p className="font-semibold capitalize">{tx.type}</p>
                   <p className="text-sm text-muted-foreground">
-                    {new Date(tx.created_at).toLocaleDateString()}
+                    {new Date(tx.createdAt).toLocaleDateString()}
                   </p>
                 </div>
                 <p className={`font-semibold ${tx.amount > 0 ? "text-green-600" : "text-red-600"}`}>

@@ -1,8 +1,25 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
-import { db } from "@/lib/db";
-import { contracts } from "@/db/schema";
+import { db } from "@/db";
+import { contracts, type ContractStatus } from "@/db/schema";
 import { eq, desc } from "drizzle-orm";
+
+const VALID_STATUSES = [
+  "active",
+  "under_negotiation",
+  "sold",
+  "expired",
+  "cancelled",
+] as const satisfies ContractStatus[];
+
+function isContractStatus(s: string): s is ContractStatus {
+  return (VALID_STATUSES as readonly string[]).includes(s);
+}
+
+function parseStatus(raw: string | null): ContractStatus {
+  const s = raw ?? "active";
+  return isContractStatus(s) ? s : "active";
+}
 import { getOrCreateUser } from "@/lib/db/queries/users";
 import { createContract } from "@/lib/db/queries/contracts";
 
@@ -48,7 +65,7 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    const status = request.nextUrl.searchParams.get("status") || "active";
+    const status = parseStatus(request.nextUrl.searchParams.get("status"));
 
     const contractList = await db
       .select()

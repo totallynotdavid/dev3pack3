@@ -57,9 +57,9 @@ export function formatPageTitle(title: string): string {
 
 /**
  * Get copyright text with specified year.
- * Use CopyrightText component for dynamic year in Server Components.
+ * @param year - Optional year override. If not provided, uses 2026.
  */
 export function getCopyrightText(year?: number): string {
-  const currentYear = year ?? new Date().getFullYear();
+  const currentYear = year ?? 2026;
   return `© ${currentYear} ${brandConfig.copyrightHolder}. All rights reserved.`;
 }

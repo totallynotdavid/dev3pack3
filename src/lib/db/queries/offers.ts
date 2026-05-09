@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { offers } from "@/db/schema";
+import { offers, type OfferStatus } from "@/db/schema";
 import { eq, desc } from "drizzle-orm";
 
 export async function createOffer(
@@ -43,7 +43,7 @@ export async function getBuyerOffers(buyerId: string) {
   });
 }
 
-export async function updateOfferStatus(offerId: string, status: string) {
+export async function updateOfferStatus(offerId: string, status: OfferStatus) {
   const updated = await db
     .update(offers)
     .set({ status, updatedAt: new Date() })

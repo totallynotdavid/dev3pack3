@@ -1,4 +1,5 @@
-import { db, type Contract, type Offer } from "@/lib/db";
+import { db } from "@/db";
+import { type Contract, type Offer } from "@/db/schema";
 import { contracts, offers } from "@/db/schema";
 import { eq, desc } from "drizzle-orm";
 import { formatMoney } from "@/lib/utils";

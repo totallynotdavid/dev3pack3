@@ -1,5 +1,5 @@
 import { db } from "@/db/index.ts";
-import { contracts } from "@/db/schema.ts";
+import { contracts, type ContractStatus, type RiskCategory } from "@/db/schema.ts";
 import { eq, desc } from "drizzle-orm";
 
 export async function createContract(
@@ -8,7 +8,7 @@ export async function createContract(
   faceValue: number,
   currency: string,
   dueDate: Date,
-  riskCategory: "low" | "medium" | "high",
+  riskCategory: RiskCategory,
   documentUrl?: string,
 ) {
   const result = await db
@@ -47,7 +47,7 @@ export async function getSellerContracts(sellerId: string) {
   });
 }
 
-export async function updateContractStatus(contractId: string, status: string) {
+export async function updateContractStatus(contractId: string, status: ContractStatus) {
   const updated = await db
     .update(contracts)
     .set({ status, updatedAt: new Date() })

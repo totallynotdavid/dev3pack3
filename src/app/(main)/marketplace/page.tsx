@@ -1,9 +1,17 @@
-import { getActiveContracts } from "@/lib/db/queries/contracts";
-import { ContractCard } from "@/ui/components/marketplace/contract-card";
+import { Suspense } from "react";
+import { ContractsList } from "./contracts-list";
 
-export default async function MarketplacePage() {
-  const contracts = await getActiveContracts();
+function ContractsLoadingSkeleton() {
+  return (
+    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      {Array.from({ length: 6 }).map((_, i) => (
+        <div key={i} className="h-64 animate-pulse rounded-lg bg-muted" />
+      ))}
+    </div>
+  );
+}
 
+export default function MarketplacePage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
@@ -13,19 +21,9 @@ export default async function MarketplacePage() {
         </p>
       </div>
 
-      {contracts.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-muted-foreground/20 bg-muted/30 px-8 py-12 text-center">
-          <p className="text-lg text-muted-foreground">
-            No contracts available yet. Check back soon!
-          </p>
-        </div>
-      ) : (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {contracts.map((contract) => (
-            <ContractCard key={contract.id} contract={contract} />
-          ))}
-        </div>
-      )}
+      <Suspense fallback={<ContractsLoadingSkeleton />}>
+        <ContractsList />
+      </Suspense>
     </div>
   );
 }

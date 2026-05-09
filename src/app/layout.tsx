@@ -9,14 +9,16 @@ export const metadata = rootMetadata;
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <ClerkProvider>
-      <html
-        lang="en"
-        suppressHydrationWarning
-        className={`${GeistSans.variable} ${GeistMono.variable} min-h-dvh`}
-      >
-        <body className="min-h-dvh font-sans">{children}</body>
-      </html>
-    </ClerkProvider>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${GeistSans.variable} ${GeistMono.variable} min-h-dvh`}
+    >
+      <ClerkProvider>
+        <body className="min-h-dvh font-sans">
+          {children}
+        </body>
+      </ClerkProvider>
+    </html>
   );
 }
