@@ -14,7 +14,7 @@ const authItems = [
 ];
 
 export function Header() {
-  const { isSignedIn } = useAuth();
+  const { isSignedIn, isLoaded } = useAuth();
   const [toast, setToast] = useState(false);
 
   useEffect(() => {
@@ -42,7 +42,7 @@ export function Header() {
           ))}
 
           {authItems.map((item) =>
-            isSignedIn ? (
+            isLoaded && isSignedIn ? (
               <Link
                 key={item.href}
                 href={item.href}
@@ -64,7 +64,7 @@ export function Header() {
         </div>
 
         <div className="flex items-center gap-3">
-          {isSignedIn ? (
+          {isLoaded && isSignedIn ? (
             <UserButton
               appearance={{
                 elements: {
