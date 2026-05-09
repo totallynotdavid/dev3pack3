@@ -1,4 +1,6 @@
-import sql, { type Offer, type OfferStatus } from "@/lib/db";
+import { db } from "@/db";
+import { offers } from "@/db/schema";
+import { eq, desc } from "drizzle-orm";
 
 export async function createOffer(
 	contractId: string,
@@ -6,74 +8,77 @@ export async function createOffer(
 	amount: number,
 	currency: string,
 	expiresAt: Date
-): Promise<Offer> {
-	const result = await sql<Offer[]>`
-    INSERT INTO offers (contract_id, buyer_id, amount, currency, expires_at)
-    VALUES (${contractId}, ${buyerId}, ${amount}, ${currency}, ${expiresAt})
-    RETURNING *
-  `;
+) {
+	const result = await db
+		.insert(offers)
+		.values({
+			contractId,
+			buyerId,
+			amount,
+			currency,
+			expiresAt,
+		})
+		.returning();
 
 	return result[0];
 }
 
-export async function getOfferById(offerId: string): Promise<Offer | null> {
-	const result = await sql<Offer[]>`
-    SELECT * FROM offers WHERE id = ${offerId}
-  `;
-
-	return result.length > 0 ? result[0] : null;
+export async function getOfferById(offerId: string) {
+	return db.query.offers.findFirst({
+		where: eq(offers.id, offerId),
+	});
 }
 
-export async function getContractOffers(contractId: string): Promise<Offer[]> {
-	return sql<Offer[]>`
-    SELECT * FROM offers
-    WHERE contract_id = ${contractId}
-    ORDER BY created_at DESC
-  `;
+export async function getContractOffers(contractId: string) {
+	return db.query.offers.findMany({
+		where: eq(offers.contractId, contractId),
+		orderBy: desc(offers.createdAt),
+	});
 }
 
-export async function getBuyerOffers(buyerId: string): Promise<Offer[]> {
-	return sql<Offer[]>`
-    SELECT * FROM offers
-    WHERE buyer_id = ${buyerId}
-    ORDER BY created_at DESC
-  `;
+export async function getBuyerOffers(buyerId: string) {
+	return db.query.offers.findMany({
+		where: eq(offers.buyerId, buyerId),
+		orderBy: desc(offers.createdAt),
+	});
 }
 
-export async function updateOfferStatus(offerId: string, status: OfferStatus): Promise<Offer> {
-	const result = await sql<Offer[]>`
-    UPDATE offers
-    SET status = ${status}, updated_at = NOW()
-    WHERE id = ${offerId}
-    RETURNING *
-  `;
+export async function updateOfferStatus(offerId: string, status: string) {
+	const updated = await db
+		.update(offers)
+		.set({ status, updatedAt: new Date() })
+		.where(eq(offers.id, offerId))
+		.returning();
 
-	return result[0];
+	return updated[0];
 }
 
-export async function setCounterOffer(offerId: string, counterAmount: number): Promise<Offer> {
-	const result = await sql<Offer[]>`
-    UPDATE offers
-    SET counter_amount = ${counterAmount}, status = 'countered', updated_at = NOW()
-    WHERE id = ${offerId}
-    RETURNING *
-  `;
+export async function setCounterOffer(offerId: string, counterAmount: number) {
+	const updated = await db
+		.update(offers)
+		.set({
+			counterAmount,
+			status: "countered",
+			updatedAt: new Date(),
+		})
+		.where(eq(offers.id, offerId))
+		.returning();
 
-	return result[0];
+	return updated[0];
 }
 
-export async function acceptOffer(offerId: string): Promise<Offer> {
+export async function acceptOffer(offerId: string) {
 	return updateOfferStatus(offerId, "accepted");
 }
 
-export async function rejectOffer(offerId: string): Promise<Offer> {
+export async function rejectOffer(offerId: string) {
 	return updateOfferStatus(offerId, "rejected");
 }
 
-export async function withdrawOffer(offerId: string): Promise<Offer> {
+export async function withdrawOffer(offerId: string) {
 	return updateOfferStatus(offerId, "withdrawn");
 }
 
-export async function expireOffer(offerId: string): Promise<Offer> {
+export async function expireOffer(offerId: string) {
 	return updateOfferStatus(offerId, "expired");
 }

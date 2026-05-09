@@ -1,10 +1,11 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
-import sql from "@/lib/db";
-import { getOrCreateUser, addToUserBalance } from "@/lib/db/queries/users";
-import { getContractById, setNegotiationDeadline } from "@/lib/db/queries/contracts";
-import { createOffer } from "@/lib/db/queries/offers";
-import { holdFunds } from "@/lib/db/queries/wallet";
+import { db } from "@/db";
+import { contracts, offers, users, walletTransactions } from "@/db/schema";
+import { eq } from "drizzle-orm";
+import { getOrCreateUser } from "@/lib/db/queries/users";
+import { getContractById } from "@/lib/db/queries/contracts";
+import { getContractOffers } from "@/lib/db/queries/offers";
 
 export async function POST(
 	request: NextRequest,
@@ -27,7 +28,7 @@ export async function POST(
 		const user = await getOrCreateUser(userId, "", "");
 
 		// Check wallet balance
-		if (user.wallet_balance < amount) {
+		if (user.walletBalance < amount) {
 			return NextResponse.json(
 				{ error: "Insufficient wallet balance" },
 				{ status: 400 }
@@ -48,46 +49,51 @@ export async function POST(
 		}
 
 		// Begin transaction: create offer and hold funds atomically
-		// postgres.js doesn't support transactions natively in a simple way,
-		// so we use raw SQL transaction
-		const result = await sql.begin(async (transaction) => {
+		const result = await db.transaction(async (tx) => {
 			// Create offer
 			const expiresAt = new Date();
 			expiresAt.setDate(expiresAt.getDate() + 7);
 
-			const offers = await transaction<
-				{ id: string }[]
-			>`
-        INSERT INTO offers (contract_id, buyer_id, amount, currency, expires_at)
-        VALUES (${contractId}, ${userId}, ${amount}, ${contract.currency}, ${expiresAt})
-        RETURNING id
-      `;
+			const newOffers = await tx
+				.insert(offers)
+				.values({
+					contractId,
+					buyerId: userId,
+					amount,
+					currency: contract.currency,
+					expiresAt,
+				})
+				.returning();
 
-			const offerId = offers[0].id;
+			const offerId = newOffers[0].id;
 
 			// Hold funds in wallet
-			await transaction`
-        UPDATE users
-        SET wallet_balance = wallet_balance - ${amount}
-        WHERE id = ${userId}
-      `;
+			await tx
+				.update(users)
+				.set({ walletBalance: user.walletBalance - amount })
+				.where(eq(users.id, userId));
 
 			// Record transaction
-			await transaction`
-        INSERT INTO wallet_transactions (user_id, amount, type, offer_id)
-        VALUES (${userId}, ${-amount}, 'hold', ${offerId})
-      `;
+			await tx.insert(walletTransactions).values({
+				userId,
+				amount: -amount,
+				type: "hold",
+				offerId,
+			});
 
 			// Set contract to under negotiation if this is first offer
 			if (contract.status === "active") {
 				const deadline = new Date();
 				deadline.setDate(deadline.getDate() + 7);
 
-				await transaction`
-          UPDATE contracts
-          SET status = 'under_negotiation', negotiation_deadline = ${deadline}, updated_at = NOW()
-          WHERE id = ${contractId}
-        `;
+				await tx
+					.update(contracts)
+					.set({
+						status: "under_negotiation",
+						negotiationDeadline: deadline,
+						updatedAt: new Date(),
+					})
+					.where(eq(contracts.id, contractId));
 			}
 
 			return offerId;
@@ -109,14 +115,8 @@ export async function GET(
 ) {
 	try {
 		const { id: contractId } = await params;
-
-		const offers = await sql`
-      SELECT * FROM offers
-      WHERE contract_id = ${contractId}
-      ORDER BY created_at DESC
-    `;
-
-		return NextResponse.json(offers);
+		const contractOffers = await getContractOffers(contractId);
+		return NextResponse.json(contractOffers);
 	} catch (error) {
 		console.error("Error fetching offers:", error);
 		return NextResponse.json(

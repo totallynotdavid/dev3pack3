@@ -12,7 +12,11 @@
     "lint": "eslint",
     "lint:fix": "eslint --fix",
     "test": "vitest",
-    "test:run": "vitest run"
+    "test:run": "vitest run",
+    "db:push": "drizzle-kit push",
+    "db:generate": "drizzle-kit generate",
+    "db:seed": "node src/db/seed.ts",
+    "db:reset": "drizzle-kit drop && drizzle-kit push && node src/db/seed.ts"
   },
   "dependencies": {
     "@clerk/nextjs": "latest",
@@ -21,6 +25,7 @@
     "@stripe/stripe-js": "latest",
     "@vercel/blob": "latest",
     "clsx": "2.1.0",
+    "drizzle-orm": "latest",
     "geist": "1.5.1",
     "lodash-es": "4.17.21",
     "lucide-react": "0.358.0",
@@ -47,6 +52,7 @@
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "autoprefixer": "10.4.23",
+    "drizzle-kit": "latest",
     "eslint": "9.39.1",
     "eslint-config-next": "16.0.7",
     "husky": "8.0.3",
