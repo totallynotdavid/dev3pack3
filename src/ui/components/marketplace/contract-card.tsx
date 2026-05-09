@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { type Contract } from "@/lib/db";
-import { formatMoney } from "@/lib/utils";
-import { RiskBadge } from "./risk-badge";
-import { ContractStatusBadge } from "./contract-status-badge";
+import { formatMoney } from "@/lib/utils.ts";
+import { RiskBadge } from "./risk-badge.tsx";
+import { ContractStatusBadge } from "./contract-status-badge.tsx";
 
 interface ContractCardProps {
   contract: Contract;

@@ -2,7 +2,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { type ReactNode } from "react";
-import { rootMetadata } from "@/lib/seo/index.ts";
+import { rootMetadata } from "@/lib/seo";
 
 const geist = Geist({
   subsets: ["latin"],
