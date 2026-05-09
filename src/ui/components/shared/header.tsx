@@ -1,11 +1,13 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { SignInButton, UserButton, useAuth } from "@clerk/nextjs";
 import Link from "next/link";
 import { Logo } from "./logo";
 
-const navItems: { label: string; href: string }[] = [
-  { label: "Marketplace", href: "/marketplace" },
+const publicItems = [{ label: "Marketplace", href: "/marketplace" }];
+
+const authItems = [
   { label: "Sell", href: "/contracts/new" },
   { label: "Wallet", href: "/dashboard/wallet" },
   { label: "Dashboard", href: "/dashboard" },
@@ -13,6 +15,13 @@ const navItems: { label: string; href: string }[] = [
 
 export function Header() {
   const { isSignedIn } = useAuth();
+  const [toast, setToast] = useState(false);
+
+  useEffect(() => {
+    if (!toast) return;
+    const t = setTimeout(() => setToast(false), 3000);
+    return () => clearTimeout(t);
+  }, [toast]);
 
   return (
     <header className="absolute top-0 z-50 w-full">
@@ -22,7 +31,7 @@ export function Header() {
         </Link>
 
         <div className="hidden items-center gap-10 text-sm font-medium text-muted-foreground md:flex">
-          {navItems.map((item) => (
+          {publicItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
@@ -31,6 +40,27 @@ export function Header() {
               {item.label}
             </Link>
           ))}
+
+          {authItems.map((item) =>
+            isSignedIn ? (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="transition-colors hover:text-foreground"
+              >
+                {item.label}
+              </Link>
+            ) : (
+              <button
+                key={item.href}
+                type="button"
+                onClick={() => setToast(true)}
+                className="transition-colors hover:text-foreground"
+              >
+                {item.label}
+              </button>
+            ),
+          )}
         </div>
 
         <div className="flex items-center gap-3">
@@ -54,6 +84,17 @@ export function Header() {
           )}
         </div>
       </nav>
+
+      {toast && (
+        <div className="pointer-events-none fixed bottom-6 left-1/2 z-[100] -translate-x-1/2">
+          <div className="animate-in fade-in slide-in-from-bottom-2 flex items-center gap-3 rounded-lg border border-border-strong bg-card px-5 py-3.5 shadow-card">
+            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-brand" />
+            <p className="text-sm font-medium text-foreground">
+              You need to sign in to access this section.
+            </p>
+          </div>
+        </div>
+      )}
     </header>
   );
 }

@@ -146,7 +146,7 @@ export default async function DashboardPage() {
                 {myContracts.map((contract) => (
                   <li key={contract.id}>
                     <Link
-                      href={`/marketplace/${contract.id}`}
+                      href={`/dashboard/contracts/${contract.id}`}
                       className="flex items-center justify-between py-4 transition-colors hover:bg-secondary/50"
                     >
                       <div>
