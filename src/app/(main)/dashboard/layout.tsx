@@ -3,16 +3,16 @@ import { auth } from "@clerk/nextjs/server";
 import { getOrCreateUser } from "@/lib/db/queries/users";
 
 async function DashboardLayout({ children }: { children: React.ReactNode }) {
-	const { userId } = await auth();
+  const { userId } = await auth();
 
-	if (!userId) {
-		redirect("/sign-in");
-	}
+  if (!userId) {
+    redirect("/sign-in");
+  }
 
-	// Ensure user exists in database
-	await getOrCreateUser(userId, "", "");
+  // Ensure user exists in database
+  await getOrCreateUser(userId, "", "");
 
-	return <>{children}</>;
+  return <>{children}</>;
 }
 
 export default DashboardLayout;

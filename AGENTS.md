@@ -138,7 +138,7 @@ const name = product.category?.name ?? "Uncategorized";
 
 // Guard when null means something is wrong
 if (!product.defaultVariant) {
-	throw new Error(`Product ${product.slug} has no default variant`);
+  throw new Error(`Product ${product.slug} has no default variant`);
 }
 ```
 
@@ -162,20 +162,20 @@ import { executePublicGraphQL, executeAuthenticatedGraphQL } from "@/lib/graphql
 
 // Public queries (menus, products, categories) - no auth, only public data
 await executePublicGraphQL(MenuDocument, {
-	variables: { slug: "footer" },
+  variables: { slug: "footer" },
 });
 
 // User queries - requires session cookies
 try {
-	const { me } = await executeAuthenticatedGraphQL(CurrentUserDocument, { cache: "no-cache" });
+  const { me } = await executeAuthenticatedGraphQL(CurrentUserDocument, { cache: "no-cache" });
 } catch {
-	// Expired token = not logged in
+  // Expired token = not logged in
 }
 
 // Checkout/cart mutations - requires session cookies
 await executeAuthenticatedGraphQL(CheckoutAddLineDocument, {
-	variables: { id: checkoutId, productVariantId: variantId },
-	cache: "no-cache",
+  variables: { id: checkoutId, productVariantId: variantId },
+  cache: "no-cache",
 });
 ```
 
@@ -186,7 +186,7 @@ Don't derive state in effects -- compute inline or in the handler:
 ```tsx
 // Bad - extra render, hard to trace
 useEffect(() => {
-	setDerivedValue(computeFrom(sourceValue));
+  setDerivedValue(computeFrom(sourceValue));
 }, [sourceValue]);
 
 // Good - compute inline
@@ -200,7 +200,7 @@ Don't use effects to push state up to a parent on mount:
 ```tsx
 // Bad - child uses effect to update parent
 useEffect(() => {
-	onLayoutChange(true);
+  onLayoutChange(true);
 }, []);
 
 // Good - parent derives state from what it knows, or callback on user action

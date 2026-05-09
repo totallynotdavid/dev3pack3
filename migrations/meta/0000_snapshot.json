@@ -123,12 +123,8 @@
           "name": "contracts_seller_id_users_id_fk",
           "tableFrom": "contracts",
           "tableTo": "users",
-          "columnsFrom": [
-            "seller_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["seller_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -246,12 +242,8 @@
           "name": "offers_contract_id_contracts_id_fk",
           "tableFrom": "offers",
           "tableTo": "contracts",
-          "columnsFrom": [
-            "contract_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["contract_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -259,12 +251,8 @@
           "name": "offers_buyer_id_users_id_fk",
           "tableFrom": "offers",
           "tableTo": "users",
-          "columnsFrom": [
-            "buyer_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["buyer_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -391,12 +379,8 @@
           "name": "wallet_transactions_user_id_users_id_fk",
           "tableFrom": "wallet_transactions",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -404,12 +388,8 @@
           "name": "wallet_transactions_offer_id_offers_id_fk",
           "tableFrom": "wallet_transactions",
           "tableTo": "offers",
-          "columnsFrom": [
-            "offer_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["offer_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }

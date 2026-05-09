@@ -5,14 +5,20 @@ export type { Database } from "@/db";
 
 // Re-export schema types
 export type {
-	users as User,
-	contracts as Contract,
-	offers as Offer,
-	walletTransactions as WalletTransaction,
+  users as User,
+  contracts as Contract,
+  offers as Offer,
+  walletTransactions as WalletTransaction,
 } from "@/db/schema";
 
 // Type aliases for convenience
 export type ContractStatus = "active" | "under_negotiation" | "sold" | "expired" | "cancelled";
-export type OfferStatus = "pending" | "countered" | "accepted" | "rejected" | "expired" | "withdrawn";
+export type OfferStatus =
+  | "pending"
+  | "countered"
+  | "accepted"
+  | "rejected"
+  | "expired"
+  | "withdrawn";
 export type RiskCategory = "low" | "medium" | "high";
 export type TransactionType = "deposit" | "hold" | "release" | "settle" | "withdraw";

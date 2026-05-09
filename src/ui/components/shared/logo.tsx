@@ -13,11 +13,11 @@
  */
 
 interface LogoProps {
-	className?: string;
-	/** Accessible label for the logo */
-	ariaLabel?: string;
-	/** Invert colors (for dark backgrounds like footer) */
-	inverted?: boolean;
+  className?: string;
+  /** Accessible label for the logo */
+  ariaLabel?: string;
+  /** Invert colors (for dark backgrounds like footer) */
+  inverted?: boolean;
 }
 
 /**
@@ -28,34 +28,34 @@ interface LogoProps {
  * allowing flexible sizing via className.
  */
 export const Logo = ({ className, ariaLabel = "Paper by Saleor", inverted = false }: LogoProps) => {
-	// When inverted, swap the light/dark mode logic
-	const lightModeLogo = inverted ? "/logo-dark.svg" : "/logo.svg";
-	const darkModeLogo = inverted ? "/logo.svg" : "/logo-dark.svg";
+  // When inverted, swap the light/dark mode logic
+  const lightModeLogo = inverted ? "/logo-dark.svg" : "/logo.svg";
+  const darkModeLogo = inverted ? "/logo.svg" : "/logo-dark.svg";
 
-	// Base styles: preserve aspect ratio to prevent CLS
-	// Height classes (e.g., h-7) will work correctly with w-auto
-	const baseStyles = "aspect-[100/23]";
+  // Base styles: preserve aspect ratio to prevent CLS
+  // Height classes (e.g., h-7) will work correctly with w-auto
+  const baseStyles = "aspect-[100/23]";
 
-	return (
-		<>
-			{/* Light mode */}
-			{/* eslint-disable-next-line @next/next/no-img-element */}
-			<img
-				src={lightModeLogo}
-				alt={ariaLabel}
-				width={100}
-				height={23}
-				className={`dark:hidden ${baseStyles} ${className ?? ""}`}
-			/>
-			{/* Dark mode */}
-			{/* eslint-disable-next-line @next/next/no-img-element */}
-			<img
-				src={darkModeLogo}
-				alt={ariaLabel}
-				width={100}
-				height={23}
-				className={`hidden dark:block ${baseStyles} ${className ?? ""}`}
-			/>
-		</>
-	);
+  return (
+    <>
+      {/* Light mode */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={lightModeLogo}
+        alt={ariaLabel}
+        width={100}
+        height={23}
+        className={`dark:hidden ${baseStyles} ${className ?? ""}`}
+      />
+      {/* Dark mode */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={darkModeLogo}
+        alt={ariaLabel}
+        width={100}
+        height={23}
+        className={`hidden dark:block ${baseStyles} ${className ?? ""}`}
+      />
+    </>
+  );
 };

@@ -16,69 +16,69 @@
  * Used as fallback when Saleor attributes don't have hex values.
  */
 export const COLOR_NAME_TO_HEX: Record<string, string> = {
-	// Neutrals
-	black: "#1a1a1a",
-	white: "#fafafa",
-	gray: "#6b7280",
-	grey: "#6b7280",
+  // Neutrals
+  black: "#1a1a1a",
+  white: "#fafafa",
+  gray: "#6b7280",
+  grey: "#6b7280",
 
-	// Primary colors
-	red: "#dc2626",
-	blue: "#2563eb",
-	green: "#16a34a",
-	yellow: "#eab308",
+  // Primary colors
+  red: "#dc2626",
+  blue: "#2563eb",
+  green: "#16a34a",
+  yellow: "#eab308",
 
-	// Secondary colors
-	orange: "#ea580c",
-	purple: "#9333ea",
-	pink: "#ec4899",
+  // Secondary colors
+  orange: "#ea580c",
+  purple: "#9333ea",
+  pink: "#ec4899",
 
-	// Browns & earth tones
-	brown: "#78350f",
-	beige: "#d4c4a8",
-	cream: "#fffdd0",
-	tan: "#d2b48c",
+  // Browns & earth tones
+  brown: "#78350f",
+  beige: "#d4c4a8",
+  cream: "#fffdd0",
+  tan: "#d2b48c",
 
-	// Blues
-	navy: "#1e3a5a",
-	"light-blue": "#38bdf8",
-	teal: "#0d9488",
-	cyan: "#06b6d4",
+  // Blues
+  navy: "#1e3a5a",
+  "light-blue": "#38bdf8",
+  teal: "#0d9488",
+  cyan: "#06b6d4",
 
-	// Greens
-	"dark-green": "#166534",
-	lime: "#84cc16",
-	olive: "#6b7021",
+  // Greens
+  "dark-green": "#166534",
+  lime: "#84cc16",
+  olive: "#6b7021",
 
-	// Reds & pinks
-	maroon: "#7f1d1d",
-	coral: "#f97316",
-	rose: "#f43f5e",
+  // Reds & pinks
+  maroon: "#7f1d1d",
+  coral: "#f97316",
+  rose: "#f43f5e",
 
-	// Purples
-	violet: "#8b5cf6",
-	indigo: "#4f46e5",
-	lavender: "#c4b5fd",
+  // Purples
+  violet: "#8b5cf6",
+  indigo: "#4f46e5",
+  lavender: "#c4b5fd",
 
-	// Metallics
-	gold: "#ca8a04",
-	silver: "#9ca3af",
+  // Metallics
+  gold: "#ca8a04",
+  silver: "#9ca3af",
 };
 
 /**
  * Check if a string is a valid hex color.
  */
 export function isValidHex(value: string): boolean {
-	// With or without # prefix, 6 or 8 characters (with alpha)
-	return /^#?[0-9A-Fa-f]{6}([0-9A-Fa-f]{2})?$/.test(value);
+  // With or without # prefix, 6 or 8 characters (with alpha)
+  return /^#?[0-9A-Fa-f]{6}([0-9A-Fa-f]{2})?$/.test(value);
 }
 
 /**
  * Normalize a hex color to have # prefix.
  */
 export function normalizeHex(value: string): string {
-	if (value.startsWith("#")) return value;
-	return `#${value}`;
+  if (value.startsWith("#")) return value;
+  return `#${value}`;
 }
 
 /**
@@ -92,33 +92,40 @@ export function normalizeHex(value: string): string {
  * @param value - The attribute value from Saleor
  * @returns Hex color string (with #) or undefined
  */
-export function getColorHex(value: { name?: string | null; value?: string | null }): string | undefined {
-	// Try hex value first (from Swatch attributes)
-	if (value.value && isValidHex(value.value)) {
-		return normalizeHex(value.value);
-	}
+export function getColorHex(value: {
+  name?: string | null;
+  value?: string | null;
+}): string | undefined {
+  // Try hex value first (from Swatch attributes)
+  if (value.value && isValidHex(value.value)) {
+    return normalizeHex(value.value);
+  }
 
-	// Fall back to color name lookup
-	if (value.name) {
-		const normalizedName = value.name.toLowerCase().replace(/\s+/g, "-");
-		return COLOR_NAME_TO_HEX[normalizedName];
-	}
+  // Fall back to color name lookup
+  if (value.name) {
+    const normalizedName = value.name.toLowerCase().replace(/\s+/g, "-");
+    return COLOR_NAME_TO_HEX[normalizedName];
+  }
 
-	return undefined;
+  return undefined;
 }
 
 /**
  * Check if an attribute slug is a color attribute.
  */
 export function isColorAttribute(slug: string): boolean {
-	const normalizedSlug = slug.toLowerCase();
-	return normalizedSlug === "color" || normalizedSlug === "colour";
+  const normalizedSlug = slug.toLowerCase();
+  return normalizedSlug === "color" || normalizedSlug === "colour";
 }
 
 /**
  * Check if an attribute slug is a size attribute.
  */
 export function isSizeAttribute(slug: string): boolean {
-	const normalizedSlug = slug.toLowerCase();
-	return normalizedSlug === "size" || normalizedSlug === "shoe-size" || normalizedSlug === "clothing-size";
+  const normalizedSlug = slug.toLowerCase();
+  return (
+    normalizedSlug === "size" ||
+    normalizedSlug === "shoe-size" ||
+    normalizedSlug === "clothing-size"
+  );
 }

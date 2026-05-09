@@ -64,9 +64,9 @@ To change the brand colors:
 
 ```css
 :root {
-	--primary: oklch(0.45 0.2 250); /* Blue */
-	--primary-foreground: oklch(0.98 0 0);
-	--ring: oklch(0.45 0.2 250);
+  --primary: oklch(0.45 0.2 250); /* Blue */
+  --primary-foreground: oklch(0.98 0 0);
+  --ring: oklch(0.45 0.2 250);
 }
 ```
 

@@ -25,85 +25,85 @@ import { seoConfig, getBaseUrl } from "./config";
  * <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
  */
 export function buildProductJsonLd(options: {
-	name: string;
-	description?: string;
-	images?: string[];
-	sku?: string | null;
-	brand?: string | null;
-	url?: string;
-	/** Single variant pricing */
-	price?: {
-		amount: number;
-		currency: string;
-	} | null;
-	/** Price range for products with variants */
-	priceRange?: {
-		lowPrice: number;
-		highPrice: number;
-		currency: string;
-	} | null;
-	inStock?: boolean;
-	variantCount?: number;
+  name: string;
+  description?: string;
+  images?: string[];
+  sku?: string | null;
+  brand?: string | null;
+  url?: string;
+  /** Single variant pricing */
+  price?: {
+    amount: number;
+    currency: string;
+  } | null;
+  /** Price range for products with variants */
+  priceRange?: {
+    lowPrice: number;
+    highPrice: number;
+    currency: string;
+  } | null;
+  inStock?: boolean;
+  variantCount?: number;
 }): WithContext<Product> | null {
-	if (!seoConfig.enableJsonLd) {
-		return null;
-	}
+  if (!seoConfig.enableJsonLd) {
+    return null;
+  }
 
-	const {
-		name,
-		description,
-		images,
-		sku,
-		brand,
-		url,
-		price,
-		priceRange,
-		inStock = true,
-		variantCount,
-	} = options;
+  const {
+    name,
+    description,
+    images,
+    sku,
+    brand,
+    url,
+    price,
+    priceRange,
+    inStock = true,
+    variantCount,
+  } = options;
 
-	const baseUrl = getBaseUrl();
-	const fullUrl = url ? `${baseUrl}${url}` : undefined;
+  const baseUrl = getBaseUrl();
+  const fullUrl = url ? `${baseUrl}${url}` : undefined;
 
-	return {
-		"@context": "https://schema.org",
-		"@type": "Product",
-		name,
-		description: description || name,
-		image: images && images.length > 0 ? images : undefined,
-		...(sku && { sku }),
-		brand: {
-			"@type": "Brand",
-			name: brand || seoConfig.defaultBrand,
-		},
-		offers: price
-			? {
-					"@type": "Offer",
-					url: fullUrl,
-					availability: inStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
-					priceCurrency: price.currency,
-					price: price.amount,
-					seller: {
-						"@type": "Organization",
-						name: seoConfig.organizationName,
-					},
-				}
-			: priceRange
-				? {
-						"@type": "AggregateOffer",
-						url: fullUrl,
-						availability: inStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
-						priceCurrency: priceRange.currency,
-						lowPrice: priceRange.lowPrice,
-						highPrice: priceRange.highPrice,
-						offerCount: variantCount,
-						seller: {
-							"@type": "Organization",
-							name: seoConfig.organizationName,
-						},
-					}
-				: undefined,
-	};
+  return {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name,
+    description: description || name,
+    image: images && images.length > 0 ? images : undefined,
+    ...(sku && { sku }),
+    brand: {
+      "@type": "Brand",
+      name: brand || seoConfig.defaultBrand,
+    },
+    offers: price
+      ? {
+          "@type": "Offer",
+          url: fullUrl,
+          availability: inStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+          priceCurrency: price.currency,
+          price: price.amount,
+          seller: {
+            "@type": "Organization",
+            name: seoConfig.organizationName,
+          },
+        }
+      : priceRange
+        ? {
+            "@type": "AggregateOffer",
+            url: fullUrl,
+            availability: inStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+            priceCurrency: priceRange.currency,
+            lowPrice: priceRange.lowPrice,
+            highPrice: priceRange.highPrice,
+            offerCount: variantCount,
+            seller: {
+              "@type": "Organization",
+              name: seoConfig.organizationName,
+            },
+          }
+        : undefined,
+  };
 }
 
 /**
@@ -113,9 +113,9 @@ export function buildProductJsonLd(options: {
  * <script {...jsonLdScriptProps(productJsonLd)} />
  */
 export function jsonLdScriptProps(data: object | null) {
-	if (!data) return null;
-	return {
-		type: "application/ld+json",
-		dangerouslySetInnerHTML: { __html: JSON.stringify(data) },
-	};
+  if (!data) return null;
+  return {
+    type: "application/ld+json",
+    dangerouslySetInnerHTML: { __html: JSON.stringify(data) },
+  };
 }
