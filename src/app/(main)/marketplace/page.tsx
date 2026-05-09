@@ -1,17 +1,5 @@
-import sql from "@/lib/db";
-import { type Contract } from "@/lib/db";
+import { getActiveContracts } from "@/lib/db/queries/contracts";
 import { ContractCard } from "@/ui/components/marketplace/contract-card";
-
-async function getActiveContracts(): Promise<Contract[]> {
-	const contracts = await sql<Contract[]>`
-    SELECT * FROM contracts
-    WHERE status = 'active'
-    ORDER BY created_at DESC
-    LIMIT 50
-  `;
-
-	return contracts;
-}
 
 export default async function MarketplacePage() {
 	const contracts = await getActiveContracts();

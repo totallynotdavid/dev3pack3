@@ -7,12 +7,10 @@ import { rootMetadata } from "@/lib/seo";
 
 export const metadata = rootMetadata;
 
-export default function RootLayout(props: { children: ReactNode }) {
-	const { children } = props;
-
+export default function RootLayout({ children }: { children: ReactNode }) {
 	return (
 		<ClerkProvider>
-			<html lang="en" className={`${GeistSans.variable} ${GeistMono.variable} min-h-dvh`}>
+			<html lang="en" suppressHydrationWarning className={`${GeistSans.variable} ${GeistMono.variable} min-h-dvh`}>
 				<body className="min-h-dvh font-sans">{children}</body>
 			</html>
 		</ClerkProvider>

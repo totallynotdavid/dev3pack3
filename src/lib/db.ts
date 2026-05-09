@@ -1,7 +1,7 @@
 // Re-export Drizzle database and types for backward compatibility
-export { db as default } from "./index";
-export { db } from "./index";
-export type { Database } from "./index";
+export { db as default } from "@/db";
+export { db } from "@/db";
+export type { Database } from "@/db";
 
 // Re-export schema types
 export type {
@@ -9,7 +9,7 @@ export type {
 	contracts as Contract,
 	offers as Offer,
 	walletTransactions as WalletTransaction,
-} from "./schema";
+} from "@/db/schema";
 
 // Type aliases for convenience
 export type ContractStatus = "active" | "under_negotiation" | "sold" | "expired" | "cancelled";
