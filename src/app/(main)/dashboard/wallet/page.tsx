@@ -4,10 +4,13 @@ import { users, walletTransactions } from "@/db/schema";
 import { eq, desc } from "drizzle-orm";
 import { WalletBalance } from "@/ui/components/marketplace/wallet-balance";
 import { formatMoney } from "@/lib/utils";
+import { PageHeader } from "@/ui/components/shared/page-header";
 
-async function getWalletData(userId: string) {
+export default async function WalletPage() {
+  const { userId } = await auth();
+  if (!userId) return null;
+
   const [user] = await db.select().from(users).where(eq(users.id, userId));
-
   const transactions = await db
     .select()
     .from(walletTransactions)
@@ -15,55 +18,88 @@ async function getWalletData(userId: string) {
     .orderBy(desc(walletTransactions.createdAt))
     .limit(20);
 
-  return { user, transactions };
-}
-
-export default async function WalletPage() {
-  const { userId } = await auth();
-  if (!userId) return null;
-
-  const { user, transactions } = await getWalletData(userId);
-
   return (
-    <div className="container mx-auto max-w-2xl px-4 py-8">
-      <h1 className="mb-8 text-4xl font-bold">Wallet</h1>
+    <div className="relative">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-[420px] bg-dot-grid opacity-60" />
 
-      {/* Wallet Balance Card */}
-      <div className="mb-8 rounded-lg border border-border bg-card p-6">
-        <div className="mb-6">
-          <p className="text-sm text-muted-foreground">Current Balance</p>
-          <p className="text-4xl font-bold">{formatMoney(user.walletBalance / 100)}</p>
-        </div>
-        <WalletBalance />
-      </div>
+      <div className="relative mx-auto max-w-[1100px] px-6 pb-24 pt-40 lg:px-12">
+        <PageHeader
+          eyebrow="Treasury"
+          title={
+            <>
+              Your <span className="italic text-brand">wallet</span>.
+            </>
+          }
+          description="Top up via Stripe. Funds settle into escrow when offers are accepted."
+        />
 
-      {/* Transaction History */}
-      <div className="rounded-lg border border-border bg-card p-6">
-        <h2 className="mb-4 text-2xl font-bold">Transaction History</h2>
-
-        {transactions.length === 0 ? (
-          <p className="text-muted-foreground">No transactions yet.</p>
-        ) : (
-          <div className="space-y-3">
-            {transactions.map((tx) => (
-              <div
-                key={tx.id}
-                className="flex items-center justify-between border-t pt-3 first:border-0 first:pt-0"
-              >
-                <div>
-                  <p className="font-semibold capitalize">{tx.type}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {new Date(tx.createdAt).toLocaleDateString()}
-                  </p>
-                </div>
-                <p className={`font-semibold ${tx.amount > 0 ? "text-green-600" : "text-red-600"}`}>
-                  {tx.amount > 0 ? "+" : ""}
-                  {formatMoney(Math.abs(tx.amount) / 100)}
-                </p>
+        <div className="grid gap-8 lg:grid-cols-5">
+          {/* Balance + deposit */}
+          <div className="lg:col-span-3">
+            <div className="rounded-lg border border-border bg-card p-8 shadow-soft">
+              <div className="mb-6 flex items-center gap-2">
+                <span className="h-1.5 w-1.5 rounded-full bg-brand" />
+                <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+                  Current Balance
+                </span>
               </div>
-            ))}
+              <p className="mb-10 font-display text-7xl tracking-tighter text-foreground">
+                {formatMoney(user.walletBalance / 100)}
+              </p>
+
+              <div className="border-t border-border pt-8">
+                <p className="mb-5 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+                  Deposit
+                </p>
+                <WalletBalance />
+              </div>
+            </div>
           </div>
-        )}
+
+          {/* Transaction history */}
+          <div className="lg:col-span-2">
+            <div className="rounded-lg border border-border bg-card p-7 shadow-soft">
+              <div className="mb-6 flex items-center gap-2">
+                <span className="h-1.5 w-1.5 rounded-full bg-foreground" />
+                <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+                  Activity
+                </span>
+              </div>
+
+              {transactions.length === 0 ? (
+                <p className="rounded-md border border-dashed border-border-strong bg-secondary px-5 py-8 text-center text-sm text-muted-foreground">
+                  No transactions yet.
+                </p>
+              ) : (
+                <ul className="divide-y divide-border">
+                  {transactions.map((tx) => (
+                    <li
+                      key={tx.id}
+                      className="flex items-center justify-between py-3.5"
+                    >
+                      <div>
+                        <p className="text-sm font-medium capitalize text-foreground">
+                          {tx.type}
+                        </p>
+                        <p className="text-xs font-medium text-muted-foreground">
+                          {new Date(tx.createdAt).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <p
+                        className={`font-display text-lg tracking-tighter ${
+                          tx.amount > 0 ? "text-success" : "text-foreground"
+                        }`}
+                      >
+                        {tx.amount > 0 ? "+" : "−"}
+                        {formatMoney(Math.abs(tx.amount) / 100)}
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

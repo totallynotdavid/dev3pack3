@@ -1,34 +1,50 @@
-import { Badge } from "@/ui/components/ui/badge";
 import { type ContractStatus } from "@/db/schema";
 
 interface ContractStatusBadgeProps {
   status: ContractStatus;
 }
 
-const statusConfig = {
+const statusConfig: Record<ContractStatus, { label: string; dot: string; bg: string; text: string }> = {
   active: {
     label: "Active",
-    variant: "default" as const,
+    dot: "bg-brand",
+    bg: "bg-card",
+    text: "text-foreground",
   },
   under_negotiation: {
     label: "Negotiating",
-    variant: "secondary" as const,
+    dot: "bg-foreground",
+    bg: "bg-card",
+    text: "text-foreground",
   },
   sold: {
     label: "Sold",
-    variant: "default" as const,
+    dot: "bg-success",
+    bg: "bg-card",
+    text: "text-foreground",
   },
   expired: {
     label: "Expired",
-    variant: "destructive" as const,
+    dot: "bg-destructive",
+    bg: "bg-card",
+    text: "text-muted-foreground",
   },
   cancelled: {
     label: "Cancelled",
-    variant: "outline-solid" as const,
+    dot: "bg-neutral-300",
+    bg: "bg-card",
+    text: "text-muted-foreground",
   },
 };
 
 export function ContractStatusBadge({ status }: ContractStatusBadgeProps) {
   const config = statusConfig[status];
-  return <Badge variant={config.variant}>{config.label}</Badge>;
+  return (
+    <span
+      className={`inline-flex items-center gap-1.5 rounded-sm border border-border ${config.bg} px-2.5 py-1 text-[11px] font-semibold uppercase tracking-widest ${config.text}`}
+    >
+      <span className={`h-1.5 w-1.5 rounded-full ${config.dot}`} aria-hidden />
+      {config.label}
+    </span>
+  );
 }

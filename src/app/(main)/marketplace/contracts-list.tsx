@@ -6,9 +6,15 @@ export async function ContractsList() {
 
   if (contracts.length === 0) {
     return (
-      <div className="rounded-lg border border-dashed border-muted-foreground/20 bg-muted/30 px-8 py-12 text-center">
-        <p className="text-lg text-muted-foreground">
-          No contracts available yet. Check back soon!
+      <div className="rounded-lg border border-border bg-card px-8 py-16 text-center shadow-soft">
+        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+          <span className="h-2.5 w-2.5 bg-brand" aria-hidden />
+        </div>
+        <p className="font-display text-2xl text-foreground">
+          No contracts available yet.
+        </p>
+        <p className="mt-2 text-sm text-muted-foreground">
+          New listings appear here as soon as sellers post them.
         </p>
       </div>
     );

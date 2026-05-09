@@ -8,6 +8,9 @@ import { Label } from "@/ui/components/ui/label";
 
 import { type RiskCategory } from "@/db/schema";
 
+const selectClass =
+  "flex h-11 w-full rounded-sm border border-border-strong bg-card px-4 py-2.5 text-base text-foreground shadow-sm transition-colors duration-150 ease-sentinel focus-visible:border-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/10 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm";
+
 export function ContractForm() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -24,10 +27,7 @@ export function ContractForm() {
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -55,7 +55,7 @@ export function ContractForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           debtorName,
-          faceValue: Math.round(faceValueNum * 100), // cents
+          faceValue: Math.round(faceValueNum * 100),
           currency,
           dueDate: new Date(dueDate).toISOString(),
           riskCategory,
@@ -90,7 +90,7 @@ export function ContractForm() {
         />
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-5 md:grid-cols-2">
         <div>
           <Label htmlFor="faceValue">Face Value *</Label>
           <Input
@@ -113,7 +113,7 @@ export function ContractForm() {
             name="currency"
             value={formData.currency}
             onChange={handleChange}
-            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+            className={selectClass}
           >
             <option value="USD">USD</option>
             <option value="PEN">PEN (Soles)</option>
@@ -121,7 +121,7 @@ export function ContractForm() {
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-5 md:grid-cols-2">
         <div>
           <Label htmlFor="dueDate">Due Date *</Label>
           <Input
@@ -141,7 +141,7 @@ export function ContractForm() {
             name="riskCategory"
             value={formData.riskCategory}
             onChange={handleChange}
-            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+            className={selectClass}
           >
             <option value="low">Low Risk</option>
             <option value="medium">Medium Risk</option>
@@ -150,10 +150,14 @@ export function ContractForm() {
         </div>
       </div>
 
-      {error && <p className="text-sm text-red-500">{error}</p>}
+      {error ? (
+        <p className="rounded-sm border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm font-medium text-destructive">
+          {error}
+        </p>
+      ) : null}
 
       <Button type="submit" className="w-full" disabled={isLoading}>
-        {isLoading ? "Creating..." : "Post Contract"}
+        {isLoading ? "Creating…" : "Post Contract"}
       </Button>
     </form>
   );

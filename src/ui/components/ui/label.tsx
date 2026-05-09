@@ -3,16 +3,12 @@ import { cn } from "@/lib/utils";
 
 export interface LabelProps extends LabelHTMLAttributes<HTMLLabelElement> {}
 
-/**
- * shadcn/ui Label component.
- * Accessible label for form inputs.
- */
 export const Label = forwardRef<HTMLLabelElement, LabelProps>(({ className, ...props }, ref) => {
   return (
     <label
       ref={ref}
       className={cn(
-        "text-sm font-medium leading-none",
+        "mb-2 block text-[11px] font-semibold uppercase tracking-widest text-muted-foreground",
         "peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
         className,
       )}

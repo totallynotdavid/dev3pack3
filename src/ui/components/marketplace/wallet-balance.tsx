@@ -35,7 +35,6 @@ export function WalletBalance() {
       }
 
       const data = await response.json();
-      // Redirect to Stripe checkout
       window.location.href = data.checkoutUrl;
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
@@ -44,7 +43,7 @@ export function WalletBalance() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-5">
       <div>
         <Label htmlFor="deposit-amount">Deposit Amount (USD)</Label>
         <Input
@@ -59,10 +58,14 @@ export function WalletBalance() {
         />
       </div>
 
-      {error && <p className="text-sm text-red-500">{error}</p>}
+      {error ? (
+        <p className="rounded-sm border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm font-medium text-destructive">
+          {error}
+        </p>
+      ) : null}
 
       <Button type="submit" className="w-full" disabled={isLoading}>
-        {isLoading ? "Processing..." : "Deposit via Stripe"}
+        {isLoading ? "Processing…" : "Deposit via Stripe"}
       </Button>
     </form>
   );

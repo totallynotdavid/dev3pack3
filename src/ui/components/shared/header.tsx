@@ -1,48 +1,57 @@
 "use client";
 
-import { SignInButton, UserButton } from "@clerk/nextjs";
-import { useAuth } from "@clerk/nextjs";
+import { SignInButton, UserButton, useAuth } from "@clerk/nextjs";
 import Link from "next/link";
 import { Logo } from "./logo";
+
+const navItems: { label: string; href: string }[] = [
+  { label: "Marketplace", href: "/marketplace" },
+  { label: "Sell", href: "/contracts/new" },
+  { label: "Wallet", href: "/dashboard/wallet" },
+  { label: "Dashboard", href: "/dashboard" },
+];
 
 export function Header() {
   const { isSignedIn } = useAuth();
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <nav className="container mx-auto flex items-center justify-between px-4 py-4">
-        <Link href="/" className="flex items-center gap-2">
+    <header className="absolute top-0 z-50 w-full">
+      <nav className="mx-auto flex max-w-[1400px] items-center justify-between px-6 py-8 lg:px-12">
+        <Link href="/" className="shrink-0">
           <Logo />
-          <span className="font-semibold">Marketplace</span>
         </Link>
 
-        <div className="flex items-center gap-6">
-          <Link href="/marketplace" className="text-sm font-medium hover:text-foreground/80">
-            Browse
-          </Link>
+        <div className="hidden items-center gap-10 text-sm font-medium text-muted-foreground md:flex">
+          {navItems.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="transition-colors hover:text-foreground"
+            >
+              {item.label}
+            </Link>
+          ))}
+        </div>
 
-          {isSignedIn && (
-            <>
-              <Link href="/dashboard" className="text-sm font-medium hover:text-foreground/80">
-                Dashboard
-              </Link>
-              <Link href="/contracts/new" className="text-sm font-medium hover:text-foreground/80">
-                Sell Contract
-              </Link>
-            </>
+        <div className="flex items-center gap-3">
+          {isSignedIn ? (
+            <UserButton
+              appearance={{
+                elements: {
+                  avatarBox: "h-9 w-9 ring-1 ring-border-strong",
+                },
+              }}
+            />
+          ) : (
+            <SignInButton mode="modal">
+              <button
+                type="button"
+                className="rounded-sm bg-foreground px-6 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-neutral-800"
+              >
+                Sign In
+              </button>
+            </SignInButton>
           )}
-
-          <div>
-            {isSignedIn ? (
-              <UserButton />
-            ) : (
-              <SignInButton mode="modal">
-                <button className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90">
-                  Sign In
-                </button>
-              </SignInButton>
-            )}
-          </div>
         </div>
       </nav>
     </header>

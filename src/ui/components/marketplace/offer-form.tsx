@@ -28,7 +28,7 @@ export function OfferForm({ contractId, faceValue }: OfferFormProps) {
       return;
     }
 
-    const offerAmount = parseInt(amount) * 100; // Convert to cents
+    const offerAmount = parseInt(amount) * 100;
 
     if (!amount || offerAmount <= 0) {
       setError("Please enter a valid amount");
@@ -56,7 +56,6 @@ export function OfferForm({ contractId, faceValue }: OfferFormProps) {
 
       setAmount("");
       router.refresh();
-      // Show success message (could use toast)
       alert("Offer submitted successfully!");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
@@ -66,7 +65,7 @@ export function OfferForm({ contractId, faceValue }: OfferFormProps) {
   };
 
   if (!isLoaded) {
-    return <div className="animate-pulse bg-muted h-32 rounded" />;
+    return <div className="h-32 animate-pulse rounded-md bg-muted" />;
   }
 
   if (!isSignedIn) {
@@ -81,7 +80,7 @@ export function OfferForm({ contractId, faceValue }: OfferFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-5">
       <div>
         <Label htmlFor="amount">Offer Amount (USD)</Label>
         <Input
@@ -94,15 +93,19 @@ export function OfferForm({ contractId, faceValue }: OfferFormProps) {
           step="0.01"
           min="0"
         />
-        <p className="mt-1 text-xs text-muted-foreground">
-          Max: {(faceValue / 100).toFixed(2)} USD
+        <p className="mt-2 text-xs font-medium text-muted-foreground">
+          Maximum {(faceValue / 100).toFixed(2)} USD
         </p>
       </div>
 
-      {error && <p className="text-sm text-red-500">{error}</p>}
+      {error ? (
+        <p className="rounded-sm border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm font-medium text-destructive">
+          {error}
+        </p>
+      ) : null}
 
       <Button type="submit" className="w-full" disabled={isLoading}>
-        {isLoading ? "Submitting..." : "Submit Offer"}
+        {isLoading ? "Submitting…" : "Submit Offer"}
       </Button>
     </form>
   );
