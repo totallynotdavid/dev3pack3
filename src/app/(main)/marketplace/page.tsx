@@ -31,8 +31,8 @@ export default function MarketplacePage() {
         id="contracts"
         className="relative border-t border-border bg-background"
       >
-        <div className="mx-auto max-w-[1400px] px-6 py-20 lg:px-12 lg:py-28">
-          <div className="mb-14 flex flex-col items-start justify-between gap-6 lg:flex-row lg:items-end">
+        <div className="mx-auto max-w-[1400px] px-4 py-12 sm:px-6 sm:py-16 lg:px-12 lg:py-28">
+          <div className="mb-10 flex flex-col items-start justify-between gap-4 sm:mb-14 sm:gap-6 lg:flex-row lg:items-end">
             <div className="max-w-2xl">
               <div className="mb-6 flex items-center gap-3">
                 <span className="h-2.5 w-2.5 bg-brand" aria-hidden />
@@ -61,14 +61,21 @@ export default function MarketplacePage() {
             </div>
           </div>
 
-          <div className="flex items-start gap-8 xl:gap-12">
+          <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-8 xl:gap-12">
             <div className="min-w-0 flex-1">
               <Suspense fallback={<ContractsLoadingSkeleton />}>
                 <ContractsList />
               </Suspense>
             </div>
-            <aside className="hidden lg:block w-[360px] xl:w-[400px] flex-shrink-0">
-              <div className="sticky top-8">
+            <aside className="w-full lg:w-[360px] xl:w-[400px] lg:flex-shrink-0">
+              <div className="mb-5 flex items-center gap-3 lg:hidden">
+                <span className="h-px flex-1 bg-border-strong" aria-hidden />
+                <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+                  AI Assistant
+                </span>
+                <span className="h-px flex-1 bg-border-strong" aria-hidden />
+              </div>
+              <div className="lg:sticky lg:top-8">
                 <Chatbot />
               </div>
             </aside>

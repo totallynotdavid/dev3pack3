@@ -98,7 +98,7 @@ export function Chatbot() {
   const showQuickQuestions = messages.length === 1 && !loading;
 
   return (
-    <div className="flex h-[600px] flex-col overflow-hidden rounded-lg border border-border bg-card shadow-card">
+    <div className="flex h-[480px] flex-col overflow-hidden rounded-lg border border-border bg-card shadow-card sm:h-[540px] lg:h-[600px]">
       {/* ── Header ─────────────────────────────────────────── */}
       <div className="flex items-center justify-between border-b border-border px-5 py-4">
         <div className="flex items-center gap-3">
