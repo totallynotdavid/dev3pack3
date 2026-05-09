@@ -15,7 +15,7 @@
     "test:run": "vitest run",
     "db:push": "drizzle-kit push",
     "db:generate": "drizzle-kit generate",
-    "db:seed": "node src/db/seed.ts",
+    "db:seed": "bun src/db/seed.ts",
     "db:reset": "drizzle-kit drop && drizzle-kit push && node src/db/seed.ts"
   },
   "dependencies": {

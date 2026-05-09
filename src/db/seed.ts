@@ -1,6 +1,5 @@
-import { db } from "./index";
-import { users, contracts } from "./schema";
-import { sql } from "drizzle-orm";
+import { db } from "./index.ts";
+import { users, contracts } from "./schema.ts";
 
 async function seed() {
 	console.log("🌱 Seeding database...");
