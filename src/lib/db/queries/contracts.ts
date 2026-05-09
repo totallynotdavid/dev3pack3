@@ -1,7 +1,6 @@
-import { db } from "@/db";
-import { contracts } from "@/db/schema";
-import { eq, and, desc } from "drizzle-orm";
-import { sql } from "drizzle-orm";
+import { db } from "@/db/index.ts";
+import { contracts } from "@/db/schema.ts";
+import { eq, desc } from "drizzle-orm";
 
 export async function createContract(
   sellerId: string,
