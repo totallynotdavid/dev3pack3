@@ -13,12 +13,7 @@ import {
   type SolanaSignTransactionMethod,
 } from "@solana/wallet-standard-features";
 import { address } from "@solana/kit";
-import type {
-  SolanaChain,
-  WalletConnector,
-  WalletConnectorMetadata,
-  WalletSession,
-} from "./types";
+import type { SolanaChain, WalletConnector, WalletConnectorMetadata, WalletSession } from "./types";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
@@ -36,7 +31,9 @@ function isSignTransactionMethod(value: unknown): value is SolanaSignTransaction
   return typeof value === "function";
 }
 
-function isSignAndSendTransactionMethod(value: unknown): value is SolanaSignAndSendTransactionMethod {
+function isSignAndSendTransactionMethod(
+  value: unknown,
+): value is SolanaSignAndSendTransactionMethod {
   return typeof value === "function";
 }
 
@@ -78,7 +75,9 @@ function getSignAndSendTransactionMethod(
     return undefined;
   }
   const signAndSendTransaction = feature.signAndSendTransaction;
-  return isSignAndSendTransactionMethod(signAndSendTransaction) ? signAndSendTransaction : undefined;
+  return isSignAndSendTransactionMethod(signAndSendTransaction)
+    ? signAndSendTransaction
+    : undefined;
 }
 
 function isSolanaWallet(wallet: StandardWallet): boolean {

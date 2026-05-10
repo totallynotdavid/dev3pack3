@@ -38,7 +38,10 @@ function createSendingSigner(session: WalletSession, chain: SolanaChain): Transa
  * changed compute budget). Extracting only signatures and applying them
  * to the original message would cause a signature/message mismatch.
  */
-function createModifyingSigner(session: WalletSession, chain: SolanaChain): TransactionModifyingSigner {
+function createModifyingSigner(
+  session: WalletSession,
+  chain: SolanaChain,
+): TransactionModifyingSigner {
   const decoder = getTransactionDecoder();
   return {
     address: session.account.address,

@@ -1,5 +1,4 @@
 import { address, signature, type Address, type Signature } from "@solana/kit";
-import { CLUSTERS, type ClusterMoniker } from "./solana-client";
 
 type JsonObject = Record<string, unknown>;
 
@@ -39,16 +38,4 @@ export function parseApiErrorMessage(body: unknown, fallback: string): string {
   if (!isObject(body)) return fallback;
   const message = getStringField(body, "error");
   return message && message.length > 0 ? message : fallback;
-}
-
-function isClusterMoniker(value: string): value is ClusterMoniker {
-  return CLUSTERS.some((cluster) => cluster === value);
-}
-
-export function resolveSolanaCluster(
-  clusterValue: string | undefined,
-  fallback: ClusterMoniker = "devnet",
-): ClusterMoniker {
-  if (!clusterValue) return fallback;
-  return isClusterMoniker(clusterValue) ? clusterValue : fallback;
 }
