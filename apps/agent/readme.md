@@ -1,52 +1,50 @@
-# agent
+# FactorBridge agent
 
-Production AI agent for bilateral factoring workflows. The service runs on Google ADK with tool execution against Supabase/PostgreSQL and is deployed on Cloud Run.
+AI service for factoring operations in Sentinel V3.
 
-## Scope
+FactorBridge handles identity checks (RUC/DNI), credit-context generation, factor matching, and intent registration.
 
-- Validate payer/counterparty identity (RUC/DNI workflows).
-- Build risk context from credit profile signals.
-- Match invoice opportunities to active factors.
-- Register platform intents for downstream workflows.
+## Setup and run
 
-## Runtime Stack
+Runtime: Python 3.10+, `google-adk[extensions]==1.33.0`, LiteLLM via `MODEL_PROVIDER`, PostgreSQL via `POSTGRES_URL`.
 
-- Python 3.10+
-- `google-adk` (with LiteLLM extensions)
-- Provider routing by `MODEL_PROVIDER`
-- Supabase PostgreSQL via `POSTGRES_URL`
-
-## Local Setup
+Local setup:
 
 ```bash
 cd apps/agent
 uv venv
+source .venv/bin/activate
 uv sync
 cp factor_bridge_agent/.env.example factor_bridge_agent/.env
 ```
 
-Set required secrets in `factor_bridge_agent/.env`:
+Required vars: `MODEL_PROVIDER`, `POSTGRES_URL`, and `HUGGINGFACE_API_KEY` or `OPENROUTER_API_KEY`.
 
-- `MODEL_PROVIDER`
-- `POSTGRES_URL`
-- `HUGGINGFACE_API_KEY` or `OPENROUTER_API_KEY` (based on provider)
-
-## Run Modes
+Run modes:
 
 ```bash
-# Interactive web UI
 adk web
-
-# CLI run
 adk run factor_bridge_agent
-
-# API server mode
 adk api_server factor_bridge_agent --port 8080
 ```
 
-## API Contract
+From repo root (Docker stack):
 
-Primary query endpoint in deployed environments:
+```bash
+make up
+make logs
+make test
+```
+
+## API and docs
+
+Health check:
+
+```http
+GET /health
+```
+
+Query:
 
 ```http
 POST /query
@@ -59,13 +57,5 @@ Content-Type: application/json
 }
 ```
 
-Health check:
-
-```http
-GET /health
-```
-
-## Docs
-
-- Deployment runbook: `docs/deployment_gcp.md`
-- Model/provider strategy: `docs/model_providers.md`
+- [deployment_gcp.md](/home/dubu/git/dev3pack3/apps/agent/docs/deployment_gcp.md)
+- [model_providers.md](/home/dubu/git/dev3pack3/apps/agent/docs/model_providers.md)
