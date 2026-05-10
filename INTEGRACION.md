@@ -77,7 +77,7 @@ Este proyecto integra:
 
 ### 4. Programa Anchor Vault
 
-**Ubicación:** `anchor/programs/vault/`
+**Ubicación:** `apps/chain/programs/vault/`
 
 **Programa ID:** `E2ktDEGKW32XkJ9RimNXapE4DKCPnwRnFc33MvrKnqmc`
 
@@ -115,7 +115,7 @@ POST https://factor-bridge-agent-197950168142.us-central1.run.app/query
 ```typescript
 {
   "response": "El RUC 20512345678 pertenece a...",
-  "agent": "factor_bridge",
+  "agent": "apps/agent",
   "version": "0.1.0"
 }
 ```
@@ -208,6 +208,7 @@ STRIPE_SECRET_KEY=...
 ### 1. Instalar dependencias
 
 ```bash
+cd apps/web
 bun install
 ```
 
@@ -221,6 +222,7 @@ cp .env.example .env
 ### 3. Inicializar base de datos
 
 ```bash
+cd apps/web
 bun db:push
 bun db:seed
 ```
@@ -228,7 +230,7 @@ bun db:seed
 ### 4. Compilar programa Anchor (opcional)
 
 ```bash
-cd anchor
+cd apps/chain
 anchor build
 anchor deploy --provider.cluster devnet
 ```
@@ -236,7 +238,7 @@ anchor deploy --provider.cluster devnet
 ### 5. Ejecutar desarrollo
 
 ```bash
-bun dev
+make up
 ```
 
 ## Testing en Devnet
@@ -318,7 +320,7 @@ src/
 │   ├── layout.tsx                       # Root layout con providers
 │   └── (main)/
 │       └── marketplace/page.tsx         # Con chatbot
-└── anchor/
+└── apps/chain/
     └── programs/vault/
         └── src/lib.rs                   # Programa Solana
 ```
@@ -327,7 +329,7 @@ src/
 
 - [Solana Devnet Explorer](https://explorer.solana.com/?cluster=devnet)
 - [Solana Faucet](https://faucet.solana.com/)
-- [FactorBridge Agent Docs](../factor_bridge/docs/)
+- [FactorBridge Agent Docs](./apps/agent/docs/)
 - [Anchor Documentation](https://www.anchor-lang.com/)
 - [Solana Kit Docs](https://solana.com/docs)
 
@@ -361,4 +363,4 @@ src/
 Para soporte técnico o preguntas:
 
 - Revisar issues en GitHub
-- Consultar documentación del agente en `factor_bridge/docs/`
+- Consultar documentación del agente en `apps/agent/docs/`

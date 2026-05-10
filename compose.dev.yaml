@@ -1,0 +1,33 @@
+services:
+  web:
+    image: oven/bun:1
+    working_dir: /app
+    command: sh -c "bun install && bun dev"
+    env_file:
+      - .env.local
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/sentinel
+      POSTGRES_URL: postgresql://postgres:postgres@postgres:5432/sentinel
+      NEXT_PUBLIC_AGENT_API_URL: http://agent:8080/query
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./apps/web:/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  agent:
+    build:
+      context: ./apps/agent
+      dockerfile: Dockerfile
+    env_file:
+      - .env.local
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/sentinel
+      POSTGRES_URL: postgresql://postgres:postgres@postgres:5432/sentinel
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy

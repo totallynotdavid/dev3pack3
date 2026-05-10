@@ -48,6 +48,7 @@ git clone <repo-url>
 cd dev3pack3
 
 # Instalar dependencias
+cd apps/web
 bun install
 
 # Configurar variables de entorno
@@ -55,11 +56,12 @@ cp .env.example .env
 # Editar .env con tus claves
 
 # Inicializar base de datos
+cd apps/web
 bun db:push
 bun db:seed
 
 # Ejecutar en desarrollo
-bun dev
+make up
 ```
 
 ### 3. Configuración de Variables de Entorno
@@ -463,8 +465,8 @@ UI/UX:
 ## 📖 Documentación Adicional
 
 - [INTEGRACION.md](./INTEGRACION.md) - Guía completa de integración
-- [anchor/programs/vault/](./anchor/programs/vault/) - Programa Solana Vault
-- [FactorBridge Agent Docs](../factor_bridge/docs/) - Documentación del agente
+- [apps/chain/programs/vault/](./apps/chain/programs/vault/) - Programa Solana Vault
+- [FactorBridge Agent Docs](./apps/agent/docs/) - Documentación del agente
 
 ## 🔐 Seguridad
 
