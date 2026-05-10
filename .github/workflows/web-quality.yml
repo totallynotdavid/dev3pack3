@@ -36,6 +36,9 @@ jobs:
     name: format, lint, typecheck, build
     runs-on: ubuntu-latest
 
+    environment:
+      name: build
+
     steps:
       - name: checkout
         uses: actions/checkout@v4
