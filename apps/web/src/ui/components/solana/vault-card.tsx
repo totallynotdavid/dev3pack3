@@ -10,6 +10,7 @@ import { useVaultWithdraw } from "@/lib/solana/hooks/use-vault-withdraw";
 import { lamportsToSolString } from "@/lib/solana/lamports";
 import { useCluster } from "@/lib/solana/cluster-context";
 import { ellipsify } from "@/lib/solana/explorer";
+import { Label } from "@/ui/components/ui/label";
 
 export function VaultCard() {
   const { wallet, status } = useWallet();
@@ -113,11 +114,12 @@ export function VaultCard() {
 
         {vaultIsEmpty ? (
           <div>
-            <label className="mb-2 block text-xs text-muted-foreground">
+            <Label htmlFor="vault-lock-amount" className="mb-2 block text-xs text-muted-foreground">
               Lock SOL as offer collateral
-            </label>
+            </Label>
             <div className="flex gap-2">
               <input
+                id="vault-lock-amount"
                 type="number"
                 step="0.01"
                 min="0"

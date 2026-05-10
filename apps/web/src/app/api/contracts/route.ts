@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
 import { contracts, type ContractStatus } from "@/db/schema";
 import { eq, desc } from "drizzle-orm";
+import { parseCreateContractBody } from "@/lib/http/request-parsers";
 
 const VALID_STATUSES = [
   "active",
@@ -31,18 +32,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { debtorName, faceValue, currency, dueDate, riskCategory } = (await request.json()) as {
-      debtorName: string;
-      faceValue: number;
-      currency: string;
-      dueDate: string;
-      riskCategory: "low" | "medium" | "high";
-    };
-
-    // Validate input
-    if (!debtorName || !faceValue || !dueDate || !riskCategory) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
-    }
+    const { debtorName, faceValue, currency, dueDate, riskCategory } = parseCreateContractBody(
+      await request.json(),
+    );
 
     // Ensure user exists
     await getOrCreateUser(userId, "", "");
@@ -60,6 +52,9 @@ export async function POST(request: NextRequest) {
     revalidateTag("contracts", "max");
     return NextResponse.json({ id: contract.id, success: true });
   } catch (error) {
+    if (error instanceof Error && error.message.includes("required fields")) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
     console.error("Error creating contract:", error);
     return NextResponse.json({ error: "Failed to create contract" }, { status: 500 });
   }

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useAuth } from "@clerk/nextjs";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/ui/components/ui/button";
 import { Input } from "@/ui/components/ui/input";
@@ -17,11 +18,13 @@ export function OfferForm({ contractId, faceValue }: OfferFormProps) {
   const { isSignedIn, isLoaded } = useAuth();
   const [amount, setAmount] = useState<string>("");
   const [error, setError] = useState<string>("");
+  const [success, setSuccess] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setSuccess("");
 
     if (!isSignedIn) {
       setError("Please sign in to make an offer");
@@ -56,7 +59,7 @@ export function OfferForm({ contractId, faceValue }: OfferFormProps) {
 
       setAmount("");
       router.refresh();
-      alert("Offer submitted successfully!");
+      setSuccess("Offer submitted successfully.");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
@@ -73,7 +76,7 @@ export function OfferForm({ contractId, faceValue }: OfferFormProps) {
       <div className="text-center">
         <p className="mb-4 text-sm text-muted-foreground">Sign in to make an offer</p>
         <Button className="w-full" asChild>
-          <a href="/sign-in">Sign In</a>
+          <Link href="/sign-in">Sign In</Link>
         </Button>
       </div>
     );
@@ -101,6 +104,11 @@ export function OfferForm({ contractId, faceValue }: OfferFormProps) {
       {error ? (
         <p className="rounded-sm border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm font-medium text-destructive">
           {error}
+        </p>
+      ) : null}
+      {success ? (
+        <p className="rounded-sm border border-emerald-600/30 bg-emerald-600/5 px-3 py-2 text-sm font-medium text-emerald-700">
+          {success}
         </p>
       ) : null}
 

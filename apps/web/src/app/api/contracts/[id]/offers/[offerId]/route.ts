@@ -6,8 +6,7 @@ import { contracts, offers, users, walletTransactions } from "@/db/schema";
 import { eq, and, ne, sql } from "drizzle-orm";
 import { getContractById } from "@/lib/db/queries/contracts";
 import { getOfferById } from "@/lib/db/queries/offers";
-
-type Action = "accept" | "reject" | "counter";
+import { parseOfferActionBody } from "@/lib/http/request-parsers";
 
 export async function PATCH(
   request: NextRequest,
@@ -18,8 +17,7 @@ export async function PATCH(
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const { id: contractId, offerId } = await params;
-    const body = (await request.json()) as { action: Action; counterAmount?: number };
-    const { action, counterAmount } = body;
+    const { action, counterAmount } = parseOfferActionBody(await request.json());
 
     const contract = await getContractById(contractId);
     if (!contract) return NextResponse.json({ error: "Contract not found" }, { status: 404 });
@@ -111,9 +109,6 @@ export async function PATCH(
         });
       });
     } else if (action === "counter") {
-      if (!counterAmount || counterAmount <= 0) {
-        return NextResponse.json({ error: "Invalid counter amount" }, { status: 400 });
-      }
       await db
         .update(offers)
         .set({ counterAmount, status: "countered", updatedAt: new Date() })
@@ -125,6 +120,14 @@ export async function PATCH(
     revalidateTag("contracts", "max");
     return NextResponse.json({ success: true });
   } catch (error) {
+    if (
+      error instanceof Error &&
+      (error.message === "Invalid action" ||
+        error.message === "Invalid counter amount" ||
+        error.message === "Invalid request body")
+    ) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
     console.error("Error processing offer action:", error);
     return NextResponse.json({ error: "Failed to process action" }, { status: 500 });
   }

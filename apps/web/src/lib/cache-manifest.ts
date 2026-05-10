@@ -73,16 +73,38 @@ export const CACHE_PROFILES = profiles;
 // Helpers for "use cache" functions
 // ============================================================================
 
+function applyCacheLifeProfile(profile: CacheLifeProfile) {
+  switch (profile) {
+    case "default":
+      cacheLife("default");
+      return;
+    case "seconds":
+      cacheLife("seconds");
+      return;
+    case "minutes":
+      cacheLife("minutes");
+      return;
+    case "hours":
+      cacheLife("hours");
+      return;
+    case "days":
+      cacheLife("days");
+      return;
+    case "weeks":
+      cacheLife("weeks");
+      return;
+    case "max":
+      cacheLife("max");
+      return;
+  }
+}
+
 /**
  * Apply cacheLife + cacheTag for a profile inside a "use cache" function body.
  * Pass `slug` when the profile's tagPattern contains a {slug} placeholder.
- *
- * Note: TypeScript cannot resolve cacheLife's overloads when passed a union
- * type, so we cast through `string`. This is safe because CacheLifeProfile
- * only contains valid Next.js built-in profile names.
  */
 export function applyCacheProfile(profile: CacheProfile, slug?: string) {
-  (cacheLife as (p: string) => void)(profile.cacheProfile);
+  applyCacheLifeProfile(profile.cacheProfile);
   cacheTag(slug ? profile.tagPattern.replace("{slug}", slug) : profile.tagPattern);
 }
 

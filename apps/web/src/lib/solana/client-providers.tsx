@@ -8,10 +8,13 @@ export function ClientSolanaProviders({ children }: ProviderProps) {
   const [Providers, setProviders] = useState<ComponentType<ProviderProps> | null>(null);
 
   useEffect(() => {
-    void import("./providers").then((mod) => {
+    const loadProviders = async () => {
+      const mod = await import("./providers");
       // Functional update form so React doesn't treat the component as an updater fn
       setProviders(() => mod.SolanaProviders);
-    });
+    };
+
+    void loadProviders();
   }, []);
 
   if (!Providers) return <>{children}</>;

@@ -7,6 +7,7 @@ import { eq } from "drizzle-orm";
 import { getOrCreateUser } from "@/lib/db/queries/users";
 import { getContractById } from "@/lib/db/queries/contracts";
 import { getContractOffers } from "@/lib/db/queries/offers";
+import { parseCreateOfferBody } from "@/lib/http/request-parsers";
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -16,11 +17,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     }
 
     const { id: contractId } = await params;
-    const { amount } = (await request.json()) as { amount: number };
-
-    if (!amount || amount <= 0) {
-      return NextResponse.json({ error: "Invalid amount" }, { status: 400 });
-    }
+    const { amount } = parseCreateOfferBody(await request.json());
 
     // Get or create user
     const user = await getOrCreateUser(userId, "", "");
@@ -101,6 +98,12 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     revalidateTag("contracts", "max");
     return NextResponse.json({ id: result, success: true });
   } catch (error) {
+    if (
+      error instanceof Error &&
+      (error.message === "Invalid amount" || error.message === "Invalid request body")
+    ) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
     console.error("Error creating offer:", error);
     return NextResponse.json({ error: "Failed to create offer" }, { status: 500 });
   }
