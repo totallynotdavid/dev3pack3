@@ -69,17 +69,3 @@ To change the brand colors:
   --ring: oklch(0.45 0.2 250);
 }
 ```
-
-## Why OKLCH?
-
-OKLCH provides perceptually uniform colors, meaning:
-
-- Consistent perceived lightness across hues
-- Predictable color mixing
-- Better for accessibility (contrast calculations)
-
-Format: `oklch(lightness chroma hue)`
-
-- Lightness: 0 (black) to 1 (white)
-- Chroma: 0 (gray) to ~0.4 (vivid)
-- Hue: 0-360 degrees (0=pink, 90=yellow, 180=cyan, 270=blue)
