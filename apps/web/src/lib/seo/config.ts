@@ -10,7 +10,7 @@
  */
 
 import { brandConfig } from "@/config/brand";
-import { config } from "@/config/env";
+import { storefrontConfig } from "@/config/env-storefront";
 
 export const seoConfig = {
   /** Site name used in titles and OG tags */
@@ -52,7 +52,7 @@ export const seoConfig = {
  * Falls back to localhost for development
  */
 export function getBaseUrl(): string {
-  return config.storefront.url;
+  return storefrontConfig.url;
 }
 
 /**

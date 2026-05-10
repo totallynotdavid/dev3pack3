@@ -6,7 +6,7 @@ import { eq, sql, and, inArray } from "drizzle-orm";
 import { createSolanaClient } from "@/lib/solana/solana-client";
 import { getVaultPda } from "@/lib/solana/vault/client";
 import { parseWalletSyncRequestBody } from "@/lib/solana/wallet-sync-boundary";
-import { config } from "@/config/env";
+import { solanaConfig } from "@/config/env-solana";
 
 export async function POST(request: NextRequest) {
   try {
@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify the transaction on-chain and extract the actual withdrawn amount
-    const client = createSolanaClient(config.solana.cluster);
+    const client = createSolanaClient(solanaConfig.cluster);
 
     const tx = await client.rpc
       .getTransaction(signature, {

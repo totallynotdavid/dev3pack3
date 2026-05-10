@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { type } from "arktype";
-import { config } from "@/config/env";
+import { agentConfig } from "@/config/env-agent";
 
-const AGENT_API_URL = config.agent.apiUrl;
+const AGENT_API_URL = agentConfig.apiUrl;
 const agentProxyBodySchema = type({ "[string]": "unknown" });
 
 export async function POST(request: NextRequest) {
