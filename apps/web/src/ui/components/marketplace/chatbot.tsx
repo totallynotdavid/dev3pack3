@@ -103,7 +103,7 @@ export function Chatbot() {
         content: response,
       };
       setMessages((prev) => [...prev, aiMsg]);
-    } catch (error) {
+    } catch {
       const errorMsg: Message = {
         id: `a-${Date.now()}`,
         role: "assistant",
@@ -117,13 +117,13 @@ export function Chatbot() {
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    send(input);
+    void send(input);
   }
 
   function handleKey(e: KeyboardEvent<HTMLTextAreaElement>) {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      send(input);
+      void send(input);
     }
   }
 
