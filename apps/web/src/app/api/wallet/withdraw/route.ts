@@ -77,6 +77,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, amount: withdrawnLamports });
   } catch (error) {
+    if (error instanceof Error && error.message.startsWith("Invalid wallet sync payload:")) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
     console.error("Withdrawal sync error:", error);
     return NextResponse.json({ error: "Failed to record withdrawal" }, { status: 500 });
   }

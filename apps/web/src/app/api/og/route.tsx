@@ -1,10 +1,9 @@
 import { ImageResponse } from "next/og";
 import { type NextRequest } from "next/server";
+import { parseOgImageQuery } from "@/lib/http/request-parsers";
 
 export async function GET(request: NextRequest) {
-  const { searchParams } = request.nextUrl;
-  const title = searchParams.get("title") || "Marketplace";
-  const subtitle = searchParams.get("subtitle") || "Trade government contracts at the best rates";
+  const { title, subtitle } = parseOgImageQuery(request.nextUrl.searchParams);
 
   return new ImageResponse(
     <div

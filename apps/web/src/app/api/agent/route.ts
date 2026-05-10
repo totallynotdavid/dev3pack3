@@ -1,18 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
+import { type } from "arktype";
 import { config } from "@/config/env";
 
 const AGENT_API_URL = config.agent.apiUrl;
+const agentProxyBodySchema = type({ "[string]": "unknown" });
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
+    const parsedBody = agentProxyBodySchema(await request.json());
+    if (parsedBody instanceof type.errors) {
+      return NextResponse.json(
+        { error: `Invalid agent payload: ${parsedBody.summary}` },
+        { status: 400 },
+      );
+    }
 
     const response = await fetch(AGENT_API_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(body),
+      body: JSON.stringify(parsedBody),
     });
 
     if (!response.ok) {

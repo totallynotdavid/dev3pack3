@@ -1,84 +1,86 @@
-type JsonObject = Record<string, unknown>;
+import { type } from "arktype";
 
 export type RiskCategory = "low" | "medium" | "high";
 export type OfferAction = "accept" | "reject" | "counter";
+export type ContractStatus = "active" | "under_negotiation" | "sold" | "expired" | "cancelled";
 
-type CreateContractBody = {
-  debtorName: string;
-  faceValue: number;
-  currency: string;
-  dueDate: string;
-  riskCategory: RiskCategory;
-};
+const createContractBodySchema = type({
+  debtorName: "string > 0",
+  faceValue: "number > 0",
+  currency: "string > 0",
+  dueDate: "string > 0",
+  riskCategory: "'low' | 'medium' | 'high'",
+});
 
-type CreateOfferBody = {
-  amount: number;
-};
+const createOfferBodySchema = type({
+  amount: "number > 0",
+});
 
-type OfferActionBody = {
-  action: OfferAction;
-  counterAmount?: number;
-};
+const offerActionBodySchema = type({
+  action: "'accept' | 'reject' | 'counter'",
+  "counterAmount?": "number > 0",
+});
 
-function isObject(value: unknown): value is JsonObject {
-  return typeof value === "object" && value !== null;
+const contractStatusSchema = type(
+  "'active' | 'under_negotiation' | 'sold' | 'expired' | 'cancelled'",
+);
+
+const ogQuerySchema = type({
+  "title?": "string <= 120",
+  "subtitle?": "string <= 180",
+});
+
+export function parseCreateContractBody(body: unknown): typeof createContractBodySchema.infer {
+  const parsed = createContractBodySchema(body);
+  if (parsed instanceof type.errors) {
+    throw new Error(`Invalid contract payload: ${parsed.summary}`);
+  }
+  return parsed;
 }
 
-function getString(value: JsonObject, key: string): string | undefined {
-  const field = value[key];
-  return typeof field === "string" ? field.trim() : undefined;
+export function parseCreateOfferBody(body: unknown): typeof createOfferBodySchema.infer {
+  const parsed = createOfferBodySchema(body);
+  if (parsed instanceof type.errors) {
+    throw new Error(`Invalid offer payload: ${parsed.summary}`);
+  }
+  return parsed;
 }
 
-function getNumber(value: JsonObject, key: string): number | undefined {
-  const field = value[key];
-  return typeof field === "number" && Number.isFinite(field) ? field : undefined;
+export function parseOfferActionBody(body: unknown): typeof offerActionBodySchema.infer {
+  const parsed = offerActionBodySchema(body);
+  if (parsed instanceof type.errors) {
+    throw new Error(`Invalid offer action payload: ${parsed.summary}`);
+  }
+  if (parsed.action === "counter" && !parsed.counterAmount) {
+    throw new Error("Invalid offer action payload: counterAmount is required for counter action");
+  }
+  return parsed;
 }
 
-function parseRiskCategory(value: string | undefined): RiskCategory | undefined {
-  if (!value) return undefined;
-  return value === "low" || value === "medium" || value === "high" ? value : undefined;
+export function parseContractStatus(
+  raw: string | null,
+  fallback: ContractStatus = "active",
+): ContractStatus {
+  if (!raw) return fallback;
+  const parsed = contractStatusSchema(raw);
+  if (parsed instanceof type.errors) return fallback;
+  return parsed;
 }
 
-function parseOfferAction(value: string | undefined): OfferAction | undefined {
-  if (!value) return undefined;
-  return value === "accept" || value === "reject" || value === "counter" ? value : undefined;
-}
-
-export function parseCreateContractBody(body: unknown): CreateContractBody {
-  if (!isObject(body)) throw new Error("Invalid request body");
-
-  const debtorName = getString(body, "debtorName");
-  const currency = getString(body, "currency");
-  const dueDate = getString(body, "dueDate");
-  const riskCategory = parseRiskCategory(getString(body, "riskCategory"));
-  const faceValue = getNumber(body, "faceValue");
-
-  if (!debtorName || !currency || !dueDate || !riskCategory || !faceValue || faceValue <= 0) {
-    throw new Error("Missing or invalid required fields");
+export function parseOgImageQuery(searchParams: URLSearchParams): {
+  title: string;
+  subtitle: string;
+} {
+  const parsed = ogQuerySchema({
+    title: searchParams.get("title") ?? undefined,
+    subtitle: searchParams.get("subtitle") ?? undefined,
+  });
+  if (parsed instanceof type.errors) {
+    throw new Error(`Invalid OG query params: ${parsed.summary}`);
   }
 
-  return { debtorName, faceValue, currency, dueDate, riskCategory };
-}
-
-export function parseCreateOfferBody(body: unknown): CreateOfferBody {
-  if (!isObject(body)) throw new Error("Invalid request body");
-
-  const amount = getNumber(body, "amount");
-  if (!amount || amount <= 0) throw new Error("Invalid amount");
-
-  return { amount };
-}
-
-export function parseOfferActionBody(body: unknown): OfferActionBody {
-  if (!isObject(body)) throw new Error("Invalid request body");
-
-  const action = parseOfferAction(getString(body, "action"));
-  const counterAmount = getNumber(body, "counterAmount");
-
-  if (!action) throw new Error("Invalid action");
-  if (action === "counter" && (!counterAmount || counterAmount <= 0)) {
-    throw new Error("Invalid counter amount");
-  }
-
-  return { action, counterAmount };
+  return {
+    title: parsed.title ?? "Marketplace",
+    subtitle: parsed.subtitle ?? "Trade government contracts at the best rates",
+  };
 }

@@ -98,10 +98,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     revalidateTag("contracts", "max");
     return NextResponse.json({ id: result, success: true });
   } catch (error) {
-    if (
-      error instanceof Error &&
-      (error.message === "Invalid amount" || error.message === "Invalid request body")
-    ) {
+    if (error instanceof Error && error.message.startsWith("Invalid offer payload:")) {
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
     console.error("Error creating offer:", error);

@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, useCallback, type ReactNode } from "react";
+import { type } from "arktype";
 import type { ClusterMoniker } from "./solana-client";
 import { CLUSTERS } from "./solana-client";
 import { getExplorerUrl } from "./explorer";
@@ -14,16 +15,16 @@ type ClusterContextValue = {
 const ClusterContext = createContext<ClusterContextValue | null>(null);
 
 const STORAGE_KEY = "solana-cluster";
-
-function isClusterMoniker(value: string): value is ClusterMoniker {
-  return CLUSTERS.some((cluster) => cluster === value);
-}
+const clusterSchema = type("'devnet' | 'testnet' | 'mainnet' | 'localnet'");
 
 function getInitialCluster(): ClusterMoniker {
   if (typeof window === "undefined") return "devnet";
   const stored = localStorage.getItem(STORAGE_KEY);
-  if (stored && isClusterMoniker(stored)) {
-    return stored;
+  if (stored) {
+    const parsed = clusterSchema(stored);
+    if (!(parsed instanceof type.errors)) {
+      return parsed;
+    }
   }
   return "devnet";
 }

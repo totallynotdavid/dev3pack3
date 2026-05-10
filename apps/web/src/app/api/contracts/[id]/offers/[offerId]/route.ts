@@ -120,12 +120,7 @@ export async function PATCH(
     revalidateTag("contracts", "max");
     return NextResponse.json({ success: true });
   } catch (error) {
-    if (
-      error instanceof Error &&
-      (error.message === "Invalid action" ||
-        error.message === "Invalid counter amount" ||
-        error.message === "Invalid request body")
-    ) {
+    if (error instanceof Error && error.message.startsWith("Invalid offer action payload:")) {
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
     console.error("Error processing offer action:", error);
