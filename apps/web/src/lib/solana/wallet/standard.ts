@@ -3,17 +3,83 @@ import type { Wallet as StandardWallet } from "@wallet-standard/base";
 import {
   StandardConnect,
   StandardDisconnect,
-  type StandardConnectFeature,
-  type StandardDisconnectFeature,
+  type StandardConnectMethod,
+  type StandardDisconnectMethod,
 } from "@wallet-standard/features";
 import {
   SolanaSignTransaction,
   SolanaSignAndSendTransaction,
-  type SolanaSignTransactionFeature,
-  type SolanaSignAndSendTransactionFeature,
+  type SolanaSignAndSendTransactionMethod,
+  type SolanaSignTransactionMethod,
 } from "@solana/wallet-standard-features";
-import type { Address } from "@solana/kit";
-import type { WalletConnector, WalletConnectorMetadata, WalletSession } from "./types";
+import { address } from "@solana/kit";
+import type {
+  SolanaChain,
+  WalletConnector,
+  WalletConnectorMetadata,
+  WalletSession,
+} from "./types";
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+function isConnectMethod(value: unknown): value is StandardConnectMethod {
+  return typeof value === "function";
+}
+
+function isDisconnectMethod(value: unknown): value is StandardDisconnectMethod {
+  return typeof value === "function";
+}
+
+function isSignTransactionMethod(value: unknown): value is SolanaSignTransactionMethod {
+  return typeof value === "function";
+}
+
+function isSignAndSendTransactionMethod(value: unknown): value is SolanaSignAndSendTransactionMethod {
+  return typeof value === "function";
+}
+
+function getConnectMethod(wallet: StandardWallet): StandardConnectMethod {
+  const feature = wallet.features[StandardConnect];
+  if (!isRecord(feature)) {
+    throw new Error("Wallet does not support connect");
+  }
+  const connect = feature.connect;
+  if (!isConnectMethod(connect)) {
+    throw new Error("Wallet does not support connect");
+  }
+  return connect;
+}
+
+function getDisconnectMethod(wallet: StandardWallet): StandardDisconnectMethod | undefined {
+  const feature = wallet.features[StandardDisconnect];
+  if (!isRecord(feature)) {
+    return undefined;
+  }
+  const disconnect = feature.disconnect;
+  return isDisconnectMethod(disconnect) ? disconnect : undefined;
+}
+
+function getSignTransactionMethod(wallet: StandardWallet): SolanaSignTransactionMethod | undefined {
+  const feature = wallet.features[SolanaSignTransaction];
+  if (!isRecord(feature)) {
+    return undefined;
+  }
+  const signTransaction = feature.signTransaction;
+  return isSignTransactionMethod(signTransaction) ? signTransaction : undefined;
+}
+
+function getSignAndSendTransactionMethod(
+  wallet: StandardWallet,
+): SolanaSignAndSendTransactionMethod | undefined {
+  const feature = wallet.features[SolanaSignAndSendTransaction];
+  if (!isRecord(feature)) {
+    return undefined;
+  }
+  const signAndSendTransaction = feature.signAndSendTransaction;
+  return isSignAndSendTransactionMethod(signAndSendTransaction) ? signAndSendTransaction : undefined;
+}
 
 function isSolanaWallet(wallet: StandardWallet): boolean {
   return (
@@ -31,58 +97,46 @@ function createConnector(wallet: StandardWallet): WalletConnector {
   return {
     ...metadata,
     connect: async (options) => {
-      const connectFeature = wallet.features[
-        StandardConnect
-      ] as StandardConnectFeature[typeof StandardConnect];
-      const { accounts } = await connectFeature.connect(
-        options?.silent ? { silent: true } : undefined,
-      );
+      const connect = getConnectMethod(wallet);
+      const { accounts } = await connect(options?.silent ? { silent: true } : undefined);
 
       const account = accounts[0] ?? wallet.accounts[0];
       if (!account) throw new Error("No accounts available");
 
       const walletAccount = {
-        address: account.address as Address,
+        address: address(account.address),
         publicKey: new Uint8Array(account.publicKey),
         label: account.label,
       };
 
-      const hasSendTx = SolanaSignAndSendTransaction in wallet.features;
-      const hasSignTx = SolanaSignTransaction in wallet.features;
+      const disconnect = getDisconnectMethod(wallet);
+      const signTransaction = getSignTransactionMethod(wallet);
+      const signAndSendTransaction = getSignAndSendTransactionMethod(wallet);
 
       const session: WalletSession = {
         account: walletAccount,
         connector: metadata,
         disconnect: async () => {
-          if (StandardDisconnect in wallet.features) {
-            const feature = wallet.features[
-              StandardDisconnect
-            ] as StandardDisconnectFeature[typeof StandardDisconnect];
-            await feature.disconnect();
+          if (disconnect) {
+            await disconnect();
           }
         },
-        signTransaction: hasSignTx
-          ? async (transaction: Uint8Array, chain: string) => {
-              const feature = wallet.features[
-                SolanaSignTransaction
-              ] as SolanaSignTransactionFeature[typeof SolanaSignTransaction];
-              const [result] = await feature.signTransaction({
+        signTransaction: signTransaction
+          ? async (transaction: Uint8Array, chain: SolanaChain) => {
+              const [result] = await signTransaction({
                 account,
                 transaction,
-                chain: chain as `${string}:${string}`,
+                chain,
               });
               return new Uint8Array(result.signedTransaction);
             }
           : undefined,
-        sendTransaction: hasSendTx
-          ? async (transaction: Uint8Array, chain: string) => {
-              const feature = wallet.features[
-                SolanaSignAndSendTransaction
-              ] as SolanaSignAndSendTransactionFeature[typeof SolanaSignAndSendTransaction];
-              const [result] = await feature.signAndSendTransaction({
+        sendTransaction: signAndSendTransaction
+          ? async (transaction: Uint8Array, chain: SolanaChain) => {
+              const [result] = await signAndSendTransaction({
                 account,
                 transaction,
-                chain: chain as `${string}:${string}`,
+                chain,
               });
               return new Uint8Array(result.signature);
             }
@@ -95,8 +149,8 @@ function createConnector(wallet: StandardWallet): WalletConnector {
 }
 
 export function discoverWallets(): WalletConnector[] {
-  const { get } = getWallets();
-  return get().filter(isSolanaWallet).map(createConnector);
+  const wallets = getWallets();
+  return wallets.get().filter(isSolanaWallet).map(createConnector);
 }
 
 export function watchWallets(onChange: (connectors: WalletConnector[]) => void): () => void {

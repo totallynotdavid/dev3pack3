@@ -14,11 +14,16 @@ type ClusterContextValue = {
 const ClusterContext = createContext<ClusterContextValue | null>(null);
 
 const STORAGE_KEY = "solana-cluster";
+
+function isClusterMoniker(value: string): value is ClusterMoniker {
+  return CLUSTERS.some((cluster) => cluster === value);
+}
+
 function getInitialCluster(): ClusterMoniker {
   if (typeof window === "undefined") return "devnet";
   const stored = localStorage.getItem(STORAGE_KEY);
-  if (stored && CLUSTERS.includes(stored as ClusterMoniker)) {
-    return stored as ClusterMoniker;
+  if (stored && isClusterMoniker(stored)) {
+    return stored;
   }
   return "devnet";
 }

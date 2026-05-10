@@ -50,19 +50,7 @@ export async function POST(request: NextRequest) {
 
     const vaultPda = await getVaultPda(walletAddress);
     const accountKeys = tx.transaction.message.accountKeys;
-    const vaultIndex = accountKeys.findIndex((accountKey) => {
-      if (typeof accountKey === "string") {
-        return accountKey === vaultPda;
-      }
-      if (typeof accountKey !== "object" || accountKey === null) {
-        return false;
-      }
-      if (!("address" in accountKey)) {
-        return false;
-      }
-      const keyAddress = accountKey.address;
-      return typeof keyAddress === "string" && keyAddress === vaultPda;
-    });
+    const vaultIndex = accountKeys.findIndex((accountKey) => accountKey === vaultPda);
 
     if (vaultIndex === -1) {
       return NextResponse.json({ error: "Vault PDA not found in transaction" }, { status: 400 });

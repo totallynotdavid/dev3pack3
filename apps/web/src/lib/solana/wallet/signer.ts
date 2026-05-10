@@ -5,12 +5,11 @@ import {
   assertIsTransactionWithinSizeLimit,
   type Transaction,
   type TransactionWithLifetime,
-  type TransactionWithinSizeLimit,
   type TransactionSigner,
   type TransactionSendingSigner,
   type TransactionModifyingSigner,
 } from "@solana/kit";
-import type { WalletSession } from "./types";
+import type { SolanaChain, WalletSession } from "./types";
 
 type SignableTransaction = Transaction | (Transaction & TransactionWithLifetime);
 
@@ -19,7 +18,7 @@ function encodeTransaction(tx: SignableTransaction): Uint8Array {
   return new Uint8Array(encoded.buffer, encoded.byteOffset, encoded.byteLength);
 }
 
-function createSendingSigner(session: WalletSession, chain: string): TransactionSendingSigner {
+function createSendingSigner(session: WalletSession, chain: SolanaChain): TransactionSendingSigner {
   return {
     address: session.account.address,
     signAndSendTransactions: async (transactions) =>
@@ -39,28 +38,29 @@ function createSendingSigner(session: WalletSession, chain: string): Transaction
  * changed compute budget). Extracting only signatures and applying them
  * to the original message would cause a signature/message mismatch.
  */
-function createModifyingSigner(session: WalletSession, chain: string): TransactionModifyingSigner {
+function createModifyingSigner(session: WalletSession, chain: SolanaChain): TransactionModifyingSigner {
   const decoder = getTransactionDecoder();
   return {
     address: session.account.address,
     modifyAndSignTransactions: async (transactions) =>
       Promise.all(
         transactions.map(async (tx) => {
+          if (!("lifetimeConstraint" in tx)) {
+            throw new Error("Wallet signer requires transaction lifetime constraint");
+          }
           const signedBytes = await session.signTransaction!(encodeTransaction(tx), chain);
           const signedTx = decoder.decode(signedBytes);
           assertIsTransactionWithinSizeLimit(signedTx);
-          const lifetimeConstraint =
-            "lifetimeConstraint" in tx ? { lifetimeConstraint: tx.lifetimeConstraint } : {};
           return Object.freeze({
             ...signedTx,
-            ...lifetimeConstraint,
-          }) as Transaction & TransactionWithinSizeLimit & TransactionWithLifetime;
+            lifetimeConstraint: tx.lifetimeConstraint,
+          });
         }),
       ),
   };
 }
 
-export function createWalletSigner(session: WalletSession, chain: string): TransactionSigner {
+export function createWalletSigner(session: WalletSession, chain: SolanaChain): TransactionSigner {
   if (session.signTransaction) {
     return createModifyingSigner(session, chain);
   }

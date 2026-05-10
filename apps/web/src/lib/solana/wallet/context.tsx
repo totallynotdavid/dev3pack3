@@ -11,7 +11,7 @@ import {
   type PropsWithChildren,
 } from "react";
 import type { TransactionSigner } from "@solana/kit";
-import type { WalletConnector, WalletSession } from "./types";
+import type { SolanaChain, WalletConnector, WalletSession } from "./types";
 import { discoverWallets, watchWallets } from "./standard";
 import { createWalletSigner } from "./signer";
 import { useCluster } from "../cluster-context";
@@ -48,7 +48,7 @@ function toError(value: unknown): Error {
 
 export function WalletProvider({ children }: PropsWithChildren) {
   const { cluster } = useCluster();
-  const chain = `solana:${cluster}`;
+  const chain: SolanaChain = `solana:${cluster}`;
 
   const [connectors, setConnectors] = useState<WalletConnector[]>(() =>
     typeof window === "undefined" ? [] : discoverWallets(),

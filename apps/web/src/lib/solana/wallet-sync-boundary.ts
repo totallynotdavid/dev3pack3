@@ -1,10 +1,10 @@
-import { address, type Address } from "@solana/kit";
+import { address, signature, type Address, type Signature } from "@solana/kit";
 import { CLUSTERS, type ClusterMoniker } from "./solana-client";
 
 type JsonObject = Record<string, unknown>;
 
 type WalletSyncRequest = {
-  signature: string;
+  signature: Signature;
   walletAddress: Address;
 };
 
@@ -22,15 +22,15 @@ export function parseWalletSyncRequestBody(body: unknown): WalletSyncRequest {
     throw new Error("Invalid request body");
   }
 
-  const signature = getStringField(body, "signature")?.trim();
+  const rawSignature = getStringField(body, "signature")?.trim();
   const walletAddressRaw = getStringField(body, "walletAddress")?.trim();
 
-  if (!signature || !walletAddressRaw) {
+  if (!rawSignature || !walletAddressRaw) {
     throw new Error("Missing signature or walletAddress");
   }
 
   return {
-    signature,
+    signature: signature(rawSignature),
     walletAddress: address(walletAddressRaw),
   };
 }

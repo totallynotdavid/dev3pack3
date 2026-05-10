@@ -12,7 +12,7 @@ export function useAirdrop() {
   const [isAirdropping, setIsAirdropping] = useState(false);
 
   const requestAirdrop = useCallback(
-    async (address: Address, amount: bigint = 1_000_000_000n) => {
+    async (address: Address, amount: bigint = 1_000_000_000n): Promise<void> => {
       if (!client) return;
       if (cluster === "mainnet") {
         toast.error("Airdrop not available on mainnet");
@@ -23,10 +23,9 @@ export function useAirdrop() {
       try {
         toast.info("Requesting airdrop...");
 
-        const signature = await client.airdrop(address, lamports(amount));
+        await client.airdrop(address, lamports(amount));
 
         toast.success(`Airdrop successful! ${Number(amount) / 1_000_000_000} SOL received`);
-        return signature;
       } catch (error: any) {
         console.error("Airdrop error:", error);
 
