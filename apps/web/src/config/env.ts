@@ -26,7 +26,7 @@ type LoadedConfig = {
 
 type ParseHelpers = {
   mustString: (name: string) => string;
-  optionalString: (name: string, defaultValue?: string) => string | undefined;
+  optionalString: (name: string) => string | undefined;
   mustEnum: <T extends string>(name: string, allowed: readonly T[]) => T;
 };
 
@@ -45,19 +45,20 @@ function parseWithValidation(
     return value;
   };
 
-  const optionalString = (name: string, defaultValue?: string): string | undefined => {
+  const optionalString = (name: string): string | undefined => {
     const value = env[name]?.trim();
     if (value && value.length > 0) return value;
-    return defaultValue;
+    return undefined;
   };
 
   const mustEnum = <T extends string>(name: string, allowed: readonly T[]): T => {
     const value = mustString(name);
-    if (!allowed.includes(value as T)) {
+    const matched = allowed.find((entry) => entry === value);
+    if (!matched) {
       errors.push(`${name} must be one of: ${allowed.join(", ")}`);
       return allowed[0];
     }
-    return value as T;
+    return matched;
   };
 
   const parsed = parse({ mustString, optionalString, mustEnum });
@@ -77,10 +78,10 @@ export function loadConfig(env: EnvSource = process.env): LoadedConfig {
       cluster: mustEnum("NEXT_PUBLIC_SOLANA_CLUSTER", CLUSTERS),
     },
     agent: {
-      apiUrl: optionalString("NEXT_PUBLIC_AGENT_API_URL", DEFAULT_AGENT_API_URL) as string,
+      apiUrl: optionalString("NEXT_PUBLIC_AGENT_API_URL") ?? DEFAULT_AGENT_API_URL,
     },
     storefront: {
-      url: optionalString("NEXT_PUBLIC_STOREFRONT_URL", DEFAULT_STOREFRONT_URL) as string,
+      url: optionalString("NEXT_PUBLIC_STOREFRONT_URL") ?? DEFAULT_STOREFRONT_URL,
     },
     app: {
       isProduction: optionalString("NODE_ENV") === "production",
