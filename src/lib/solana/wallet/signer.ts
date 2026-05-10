@@ -15,7 +15,7 @@ function createSendingSigner(session: WalletSession, chain: string): Transaction
       const encoder = getTransactionEncoder();
       return Promise.all(
         transactions.map(async (tx) => {
-          const wireBytes = new Uint8Array(
+          const wireBytes = Uint8Array.from(
             encoder.encode(tx as Parameters<(typeof encoder)["encode"]>[0]),
           );
           const sigBytes = await session.sendTransaction!(wireBytes, chain);
@@ -42,7 +42,7 @@ function createModifyingSigner(session: WalletSession, chain: string): Transacti
       const decoder = getTransactionDecoder();
       return Promise.all(
         transactions.map(async (tx) => {
-          const wireBytes = new Uint8Array(
+          const wireBytes = Uint8Array.from(
             encoder.encode(tx as Parameters<(typeof encoder)["encode"]>[0]),
           );
           const signedBytes = await session.signTransaction!(wireBytes, chain);
