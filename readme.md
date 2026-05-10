@@ -43,13 +43,6 @@ bun run build
 bun test:run
 ```
 
-Required env vars for web:
-
-```bash
-NEXT_PUBLIC_SALEOR_API_URL=https://your-instance.saleor.cloud/graphql/
-NEXT_PUBLIC_DEFAULT_CHANNEL=your-channel-slug
-```
-
 Common optional vars: `NEXT_PUBLIC_STOREFRONT_URL`, `REVALIDATE_SECRET`, `SALEOR_WEBHOOK_SECRET`, `SALEOR_APP_TOKEN`, `SALEOR_MAX_CONCURRENT_REQUESTS`, `SALEOR_MIN_REQUEST_DELAY_MS`, `SALEOR_REQUEST_TIMEOUT_MS`, `NEXT_BUILD_RETRIES`.
 
 Required env vars for agent: `POSTGRES_URL`, `MODEL_PROVIDER`, and `HUGGINGFACE_API_KEY` or `OPENROUTER_API_KEY`.
