@@ -62,3 +62,5 @@ jobs:
 
       - name: build
         run: bun run build
+        env:
+          NEXT_PUBLIC_STOREFRONT_URL: ${{ secrets.NEXT_PUBLIC_STOREFRONT_URL }}
