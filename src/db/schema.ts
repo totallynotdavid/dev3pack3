@@ -92,7 +92,6 @@ export const walletTransactions = pgTable(
     amount: bigint("amount", { mode: "number" }).notNull(),
     type: varchar("type", { length: 20 }).notNull().$type<TransactionType>(),
     offerId: uuid("offer_id").references(() => offers.id),
-    stripePaymentIntentId: text("stripe_payment_intent_id"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => ({

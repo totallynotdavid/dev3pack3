@@ -7,7 +7,6 @@ export async function createTransaction(
   amount: number,
   type: TransactionType,
   offerId?: string | null,
-  stripePaymentIntentId?: string | null,
 ) {
   const result = await db
     .insert(walletTransactions)
@@ -16,7 +15,6 @@ export async function createTransaction(
       amount,
       type,
       offerId: offerId || null,
-      stripePaymentIntentId: stripePaymentIntentId || null,
     })
     .returning();
 
@@ -49,6 +47,6 @@ export async function settleFunds(userId: string, amount: number, offerId: strin
   return createTransaction(userId, amount, "settle", offerId);
 }
 
-export async function depositFunds(userId: string, amount: number, stripePaymentIntentId: string) {
-  return createTransaction(userId, amount, "deposit", null, stripePaymentIntentId);
+export async function depositFunds(userId: string, amount: number) {
+  return createTransaction(userId, amount, "deposit");
 }
