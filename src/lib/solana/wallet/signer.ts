@@ -2,27 +2,33 @@ import {
   getTransactionEncoder,
   getTransactionDecoder,
   signatureBytes,
+  assertIsTransactionWithinSizeLimit,
+  type Transaction,
+  type TransactionWithLifetime,
+  type TransactionWithinSizeLimit,
   type TransactionSigner,
   type TransactionSendingSigner,
   type TransactionModifyingSigner,
 } from "@solana/kit";
 import type { WalletSession } from "./types";
 
+type SignableTransaction = Transaction | (Transaction & TransactionWithLifetime);
+
+function encodeTransaction(tx: SignableTransaction): Uint8Array {
+  const encoded = getTransactionEncoder().encode(tx);
+  return new Uint8Array(encoded.buffer, encoded.byteOffset, encoded.byteLength);
+}
+
 function createSendingSigner(session: WalletSession, chain: string): TransactionSendingSigner {
   return {
     address: session.account.address,
-    signAndSendTransactions: async (transactions) => {
-      const encoder = getTransactionEncoder();
-      return Promise.all(
+    signAndSendTransactions: async (transactions) =>
+      Promise.all(
         transactions.map(async (tx) => {
-          const wireBytes = Uint8Array.from(
-            encoder.encode(tx as Parameters<(typeof encoder)["encode"]>[0]),
-          );
-          const sigBytes = await session.sendTransaction!(wireBytes, chain);
+          const sigBytes = await session.sendTransaction!(encodeTransaction(tx), chain);
           return signatureBytes(sigBytes);
         }),
-      );
-    },
+      ),
   };
 }
 
@@ -34,34 +40,23 @@ function createSendingSigner(session: WalletSession, chain: string): Transaction
  * to the original message would cause a signature/message mismatch.
  */
 function createModifyingSigner(session: WalletSession, chain: string): TransactionModifyingSigner {
+  const decoder = getTransactionDecoder();
   return {
     address: session.account.address,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    modifyAndSignTransactions: (async (transactions: readonly unknown[]) => {
-      const encoder = getTransactionEncoder();
-      const decoder = getTransactionDecoder();
-      return Promise.all(
+    modifyAndSignTransactions: async (transactions) =>
+      Promise.all(
         transactions.map(async (tx) => {
-          const wireBytes = Uint8Array.from(
-            encoder.encode(tx as Parameters<(typeof encoder)["encode"]>[0]),
-          );
-          const signedBytes = await session.signTransaction!(wireBytes, chain);
+          const signedBytes = await session.signTransaction!(encodeTransaction(tx), chain);
           const signedTx = decoder.decode(signedBytes);
-          // Return the full decoded transaction — preserving whatever the
-          // wallet signed (including any message modifications).
-          // Carry over the lifetimeConstraint from the original transaction
-          // since it's runtime metadata not present in the wire format.
+          assertIsTransactionWithinSizeLimit(signedTx);
+          const lifetimeConstraint =
+            "lifetimeConstraint" in tx ? { lifetimeConstraint: tx.lifetimeConstraint } : {};
           return Object.freeze({
             ...signedTx,
-            ...("lifetimeConstraint" in (tx as Record<string, unknown>)
-              ? {
-                  lifetimeConstraint: (tx as Record<string, unknown>).lifetimeConstraint,
-                }
-              : {}),
-          });
+            ...lifetimeConstraint,
+          }) as Transaction & TransactionWithinSizeLimit & TransactionWithLifetime;
         }),
-      );
-    }) as unknown as TransactionModifyingSigner["modifyAndSignTransactions"],
+      ),
   };
 }
 
