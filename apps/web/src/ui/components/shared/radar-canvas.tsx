@@ -91,10 +91,11 @@ export function RadarCanvas({ className = "" }: { className?: string }) {
   const rafRef = useRef<number | null>(null);
 
   useEffect(() => {
+    const noopCleanup = () => {};
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas) return noopCleanup;
     const gl = canvas.getContext("webgl");
-    if (!gl) return;
+    if (!gl) return noopCleanup;
 
     const resize = () => {
       const w = canvas.clientWidth;
@@ -111,14 +112,14 @@ export function RadarCanvas({ className = "" }: { className?: string }) {
 
     const vs = compileShader(gl, gl.VERTEX_SHADER, VERTEX_SHADER);
     const fs = compileShader(gl, gl.FRAGMENT_SHADER, FRAGMENT_SHADER);
-    if (!vs || !fs) return;
+    if (!vs || !fs) return noopCleanup;
 
     const program = gl.createProgram();
-    if (!program) return;
+    if (!program) return noopCleanup;
     gl.attachShader(program, vs);
     gl.attachShader(program, fs);
     gl.linkProgram(program);
-    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) return;
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) return noopCleanup;
 
     const positionLoc = gl.getAttribLocation(program, "position");
     const resolutionLoc = gl.getUniformLocation(program, "u_resolution");
@@ -150,7 +151,7 @@ export function RadarCanvas({ className = "" }: { className?: string }) {
     };
     rafRef.current = requestAnimationFrame(render);
 
-    return () => {
+    const cleanup = () => {
       window.removeEventListener("resize", resize);
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       gl.deleteProgram(program);
@@ -158,6 +159,7 @@ export function RadarCanvas({ className = "" }: { className?: string }) {
       gl.deleteShader(fs);
       gl.deleteBuffer(buffer);
     };
+    return cleanup;
   }, []);
 
   return <canvas ref={canvasRef} className={`absolute inset-0 h-full w-full ${className}`} />;

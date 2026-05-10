@@ -20,7 +20,7 @@ export function Header() {
   const [toast, setToast] = useState(false);
 
   useEffect(() => {
-    if (!toast) return;
+    if (!toast) return undefined;
     const t = setTimeout(() => setToast(false), 3000);
     return () => clearTimeout(t);
   }, [toast]);
