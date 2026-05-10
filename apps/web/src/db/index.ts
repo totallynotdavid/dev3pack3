@@ -1,26 +1,26 @@
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
+import { config } from "@/config/env";
 import * as schema from "./schema.ts";
 
 declare global {
-  var __postgresClient: ReturnType<typeof postgres> | undefined;
+  var postgresClientCache: ReturnType<typeof postgres> | undefined;
 }
 
 const isPgBouncer =
-  process.env.POSTGRES_URL?.includes("pgbouncer=true") ||
-  process.env.POSTGRES_URL?.includes(":6543");
+  config.db.postgresUrl.includes("pgbouncer=true") || config.db.postgresUrl.includes(":6543");
 
 const client =
-  globalThis.__postgresClient ??
-  postgres(process.env.POSTGRES_URL!, {
-    max: process.env.NODE_ENV === "production" ? 5 : 1,
+  globalThis.postgresClientCache ??
+  postgres(config.db.postgresUrl, {
+    max: config.app.isProduction ? 5 : 1,
     idle_timeout: 20,
     max_lifetime: 60 * 30,
     prepare: !isPgBouncer,
   });
 
-if (process.env.NODE_ENV !== "production") {
-  globalThis.__postgresClient = client;
+if (!config.app.isProduction) {
+  globalThis.postgresClientCache = client;
 }
 
 export const db = drizzle(client, { schema });

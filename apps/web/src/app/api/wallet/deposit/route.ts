@@ -6,10 +6,8 @@ import { eq, sql } from "drizzle-orm";
 import { getOrCreateUser } from "@/lib/db/queries/users";
 import { createSolanaClient } from "@/lib/solana/solana-client";
 import { getVaultPda } from "@/lib/solana/vault/client";
-import {
-  parseWalletSyncRequestBody,
-  resolveSolanaCluster,
-} from "@/lib/solana/wallet-sync-boundary";
+import { parseWalletSyncRequestBody } from "@/lib/solana/wallet-sync-boundary";
+import { config } from "@/config/env";
 
 export async function POST(request: NextRequest) {
   try {
@@ -19,8 +17,7 @@ export async function POST(request: NextRequest) {
     const { signature, walletAddress } = parseWalletSyncRequestBody(await request.json());
 
     // Verify the transaction on-chain and extract the actual deposited amount
-    const cluster = resolveSolanaCluster(process.env.NEXT_PUBLIC_SOLANA_CLUSTER);
-    const client = createSolanaClient(cluster);
+    const client = createSolanaClient(config.solana.cluster);
 
     const tx = await client.rpc
       .getTransaction(signature, {

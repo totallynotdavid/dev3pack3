@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
+import { config } from "@/config/env";
 
-const AGENT_API_URL =
-  process.env.NEXT_PUBLIC_AGENT_API_URL ||
-  "https://factor-bridge-agent-197950168142.us-central1.run.app/query";
+const AGENT_API_URL = config.agent.apiUrl;
 
 export async function POST(request: NextRequest) {
   try {
