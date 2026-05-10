@@ -12,6 +12,7 @@
     "format": "oxfmt .",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
+    "typecheck": "bun x tsc --noEmit",
     "test": "vitest",
     "test:run": "vitest run",
     "db:push": "drizzle-kit push",
