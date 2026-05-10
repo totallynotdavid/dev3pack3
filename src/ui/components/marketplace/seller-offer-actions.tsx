@@ -106,11 +106,7 @@ export function SellerOfferActions({ contractId, offerId }: SellerOfferActionsPr
         </div>
       ) : (
         <div className="flex flex-wrap gap-2">
-          <Button
-            size="sm"
-            onClick={() => act("accept")}
-            disabled={!!pending}
-          >
+          <Button size="sm" onClick={() => act("accept")} disabled={!!pending}>
             {pending === "accept" ? "Accepting…" : "Accept"}
           </Button>
           <Button

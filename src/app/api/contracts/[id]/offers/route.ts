@@ -36,7 +36,10 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     }
 
     if (contract.sellerId === userId) {
-      return NextResponse.json({ error: "You cannot make an offer on your own contract" }, { status: 403 });
+      return NextResponse.json(
+        { error: "You cannot make an offer on your own contract" },
+        { status: 403 },
+      );
     }
 
     if (contract.status !== "active" && contract.status !== "under_negotiation") {

@@ -38,13 +38,13 @@ Modelo: `openrouter/anthropic/claude-sonnet-4.6`
 
 ### Resultados de prueba de conectividad
 
-| Caso | Tiempo (s) | Tokens |
-|---|---|---|
-| Definicion de factoring | 4.79 | 172 |
-| Evaluacion cedente | 5.25 | 329 |
-| Factor conservador | 6.03 | 327 |
-| Riesgo sobre pagador | 5.85 | 317 |
-| Promedio | 5.48 | 286 |
+| Caso                    | Tiempo (s) | Tokens |
+| ----------------------- | ---------- | ------ |
+| Definicion de factoring | 4.79       | 172    |
+| Evaluacion cedente      | 5.25       | 329    |
+| Factor conservador      | 6.03       | 327    |
+| Riesgo sobre pagador    | 5.85       | 317    |
+| Promedio                | 5.48       | 286    |
 
 ### Error encontrado
 
@@ -131,6 +131,7 @@ Fecha: 2026-05-10
 Estado: activo en produccion
 
 `Qwen/Qwen2.5-7B-Instruct` via el provider `huggingface/` de LiteLLM:
+
 - Ejecuta herramientas correctamente via el mecanismo interno de ADK
 - Sin rate limits practicos (HF Serverless Inference gratuito)
 - Mezcla razonamiento interno (CoT) en la respuesta → resuelto con limpiador

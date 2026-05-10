@@ -79,14 +79,9 @@ export default async function WalletPage() {
               ) : (
                 <ul className="divide-y divide-border">
                   {transactions.map((tx) => (
-                    <li
-                      key={tx.id}
-                      className="flex items-center justify-between py-3.5"
-                    >
+                    <li key={tx.id} className="flex items-center justify-between py-3.5">
                       <div>
-                        <p className="text-sm font-medium capitalize text-foreground">
-                          {tx.type}
-                        </p>
+                        <p className="text-sm font-medium capitalize text-foreground">{tx.type}</p>
                         <p className="text-xs font-medium text-muted-foreground">
                           {new Date(tx.createdAt).toLocaleDateString()}
                         </p>

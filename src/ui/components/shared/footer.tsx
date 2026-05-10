@@ -16,7 +16,8 @@ export function Footer() {
           <div className="lg:col-span-5">
             <Logo />
             <p className="mt-6 max-w-sm font-display text-2xl leading-tight tracking-tight text-foreground">
-              Better business decisions, settled in <span className="italic text-brand">minutes</span>.
+              Better business decisions, settled in{" "}
+              <span className="italic text-brand">minutes</span>.
             </p>
           </div>
 

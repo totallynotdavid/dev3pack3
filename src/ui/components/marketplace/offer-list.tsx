@@ -11,10 +11,7 @@ export function OfferList({ offers }: OfferListProps) {
   return (
     <div className="space-y-3">
       {offers.map((offer) => (
-        <div
-          key={offer.id}
-          className="rounded-md border border-border bg-card p-5 shadow-soft"
-        >
+        <div key={offer.id} className="rounded-md border border-border bg-card p-5 shadow-soft">
           <div className="flex items-start justify-between">
             <div>
               <p className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">

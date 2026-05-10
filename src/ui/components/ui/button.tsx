@@ -3,7 +3,14 @@ import { Slot } from "@radix-ui/react-slot";
 import { cn } from "@/lib/utils";
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "default" | "secondary" | "outline-solid" | "outline" | "ghost" | "destructive" | "brand";
+  variant?:
+    | "default"
+    | "secondary"
+    | "outline-solid"
+    | "outline"
+    | "ghost"
+    | "destructive"
+    | "brand";
   size?: "default" | "sm" | "lg" | "icon";
   asChild?: boolean;
 }
@@ -20,8 +27,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
           "disabled:pointer-events-none disabled:opacity-50",
           {
-            "bg-foreground text-primary-foreground hover:bg-neutral-800":
-              variant === "default",
+            "bg-foreground text-primary-foreground hover:bg-neutral-800": variant === "default",
             "bg-secondary text-foreground hover:bg-muted": variant === "secondary",
             "border border-border-strong bg-card text-foreground shadow-sm hover:bg-secondary":
               variant === "outline-solid" || variant === "outline",

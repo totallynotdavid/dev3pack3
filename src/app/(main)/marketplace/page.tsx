@@ -13,10 +13,7 @@ function ContractsLoadingSkeleton() {
   return (
     <div className="grid gap-6 grid-cols-1 sm:grid-cols-2">
       {Array.from({ length: 4 }).map((_, i) => (
-        <div
-          key={i}
-          className="h-[260px] animate-pulse rounded-lg border border-border bg-card"
-        />
+        <div key={i} className="h-[260px] animate-pulse rounded-lg border border-border bg-card" />
       ))}
     </div>
   );
@@ -27,10 +24,7 @@ export default function MarketplacePage() {
     <>
       <SentinelHero />
 
-      <section
-        id="contracts"
-        className="relative border-t border-border bg-background"
-      >
+      <section id="contracts" className="relative border-t border-border bg-background">
         <div className="mx-auto max-w-[1400px] px-4 py-12 sm:px-6 sm:py-16 lg:px-12 lg:py-28">
           <div className="mb-10 flex flex-col items-start justify-between gap-4 sm:mb-14 sm:gap-6 lg:flex-row lg:items-end">
             <div className="max-w-2xl">
@@ -44,8 +38,8 @@ export default function MarketplacePage() {
                 Available <span className="italic text-brand">Contracts</span>
               </h2>
               <p className="mt-6 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-                Each contract is verified, risk-graded, and held in escrow until
-                settlement. Open an offer and negotiate directly with the seller.
+                Each contract is verified, risk-graded, and held in escrow until settlement. Open an
+                offer and negotiate directly with the seller.
               </p>
             </div>
 

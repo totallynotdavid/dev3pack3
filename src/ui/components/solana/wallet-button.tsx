@@ -9,8 +9,7 @@ import { ellipsify } from "@/lib/solana/explorer";
 import { useCluster } from "@/lib/solana/cluster-context";
 
 export function WalletButton() {
-  const { connectors, connect, disconnect, wallet, status, error } =
-    useWallet();
+  const { connectors, connect, disconnect, wallet, status, error } = useWallet();
 
   const { getExplorerUrl, cluster } = useCluster();
   const { requestAirdrop, isAirdropping } = useAirdrop();
@@ -58,9 +57,7 @@ export function WalletButton() {
 
         {isOpen && (
           <div className="absolute right-0 top-full z-50 mt-2 w-64 rounded-xl border border-border-low bg-card p-3 shadow-lg">
-            <p className="mb-2 text-xs font-medium text-muted">
-              Choose a wallet
-            </p>
+            <p className="mb-2 text-xs font-medium text-muted">Choose a wallet</p>
             <div className="space-y-1">
               {connectors.map((connector) => (
                 <button
@@ -77,19 +74,13 @@ export function WalletButton() {
                   className="flex w-full cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium transition hover:bg-cream disabled:opacity-50 disabled:pointer-events-none"
                 >
                   {connector.icon && (
-                    <img
-                      src={connector.icon}
-                      alt=""
-                      className="h-5 w-5 rounded"
-                    />
+                    <img src={connector.icon} alt="" className="h-5 w-5 rounded" />
                   )}
                   <span>{connector.name}</span>
                 </button>
               ))}
             </div>
-            {status === "connecting" && (
-              <p className="mt-2 text-xs text-muted">Connecting...</p>
-            )}
+            {status === "connecting" && <p className="mt-2 text-xs text-muted">Connecting...</p>}
             {error != null && (
               <p className="mt-2 text-xs text-destructive">
                 {error instanceof Error ? error.message : String(error)}
@@ -116,9 +107,7 @@ export function WalletButton() {
           <div className="mb-3">
             <p className="text-xs text-muted">Balance</p>
             <p className="text-lg font-bold tabular-nums">
-              {balance.lamports != null
-                ? lamportsToSolString(balance.lamports)
-                : "—"}{" "}
+              {balance.lamports != null ? lamportsToSolString(balance.lamports) : "—"}{" "}
               <span className="text-sm font-normal text-muted">SOL</span>
             </p>
           </div>

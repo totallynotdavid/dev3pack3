@@ -70,24 +70,16 @@ export function VaultCard() {
       <div className="mb-8">
         <p className="mb-1 text-xs text-muted-foreground">Wallet Balance</p>
         <p className="font-display text-5xl tracking-tighter text-foreground">
-          {balance.lamports != null
-            ? lamportsToSolString(balance.lamports, 4)
-            : "—"}
-          <span className="ml-2 text-2xl font-normal text-muted-foreground">
-            SOL
-          </span>
+          {balance.lamports != null ? lamportsToSolString(balance.lamports, 4) : "—"}
+          <span className="ml-2 text-2xl font-normal text-muted-foreground">SOL</span>
         </p>
-        <p className="mt-1 text-xs text-muted-foreground">
-          on {cluster}
-        </p>
+        <p className="mt-1 text-xs text-muted-foreground">on {cluster}</p>
       </div>
 
       {/* Airdrop (only on devnet/testnet/localnet) */}
       {cluster !== "mainnet" && (
         <div className="mb-6 rounded-lg border border-blue-500/20 bg-blue-500/5 p-4">
-          <p className="mb-3 text-xs font-medium text-foreground">
-            Test Network Faucet
-          </p>
+          <p className="mb-3 text-xs font-medium text-foreground">Test Network Faucet</p>
           <button
             onClick={handleAirdrop}
             disabled={isAirdropping}
@@ -95,9 +87,7 @@ export function VaultCard() {
           >
             {isAirdropping ? "Requesting..." : "Request 1 SOL Airdrop"}
           </button>
-          <p className="mt-2 text-xs text-muted-foreground">
-            Get test SOL for development
-          </p>
+          <p className="mt-2 text-xs text-muted-foreground">Get test SOL for development</p>
         </div>
       )}
 
@@ -109,9 +99,7 @@ export function VaultCard() {
 
         {/* Deposit */}
         <div>
-          <label className="mb-2 block text-xs text-muted-foreground">
-            Deposit to Vault
-          </label>
+          <label className="mb-2 block text-xs text-muted-foreground">Deposit to Vault</label>
           <div className="flex gap-2">
             <input
               type="number"
@@ -124,17 +112,13 @@ export function VaultCard() {
             />
             <button
               onClick={handleDeposit}
-              disabled={
-                isDepositing || !depositAmount || parseFloat(depositAmount) <= 0
-              }
+              disabled={isDepositing || !depositAmount || parseFloat(depositAmount) <= 0}
               className="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white transition hover:bg-orange-600 disabled:opacity-50"
             >
               {isDepositing ? "Depositing..." : "Deposit"}
             </button>
           </div>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Lock SOL in vault for offers
-          </p>
+          <p className="mt-1 text-xs text-muted-foreground">Lock SOL in vault for offers</p>
         </div>
 
         {/* Withdraw */}
@@ -155,9 +139,8 @@ export function VaultCard() {
       {/* Info */}
       <div className="mt-6 rounded-lg border border-dashed border-border-strong bg-secondary p-4">
         <p className="text-xs text-muted-foreground">
-          <strong>Note:</strong> Vault operations are currently in development.
-          The deposit/withdraw functions will be available once the Anchor
-          program is deployed to {cluster}.
+          <strong>Note:</strong> Vault operations are currently in development. The deposit/withdraw
+          functions will be available once the Anchor program is deployed to {cluster}.
         </p>
       </div>
     </div>

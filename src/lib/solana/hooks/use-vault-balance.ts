@@ -24,7 +24,7 @@ export function useVaultBalance(userAddress?: Address) {
       // For now, return 0
       return 0n as Lamports;
     },
-    { refreshInterval: 60_000, revalidateOnFocus: true }
+    { refreshInterval: 60_000, revalidateOnFocus: true },
   );
 
   return {

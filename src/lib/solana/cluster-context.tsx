@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  createContext,
-  useContext,
-  useState,
-  useCallback,
-  type ReactNode,
-} from "react";
+import { createContext, useContext, useState, useCallback, type ReactNode } from "react";
 import type { ClusterMoniker } from "./solana-client";
 import { CLUSTERS } from "./solana-client";
 import { getExplorerUrl } from "./explorer";
@@ -32,23 +26,17 @@ function getInitialCluster(): ClusterMoniker {
 export { CLUSTERS };
 
 export function ClusterProvider({ children }: { children: ReactNode }) {
-  const [cluster, setClusterState] =
-    useState<ClusterMoniker>(getInitialCluster);
+  const [cluster, setClusterState] = useState<ClusterMoniker>(getInitialCluster);
 
   const setCluster = useCallback((c: ClusterMoniker) => {
     setClusterState(c);
     localStorage.setItem(STORAGE_KEY, c);
   }, []);
 
-  const explorerUrl = useCallback(
-    (path: string) => getExplorerUrl(path, cluster),
-    [cluster]
-  );
+  const explorerUrl = useCallback((path: string) => getExplorerUrl(path, cluster), [cluster]);
 
   return (
-    <ClusterContext.Provider
-      value={{ cluster, setCluster, getExplorerUrl: explorerUrl }}
-    >
+    <ClusterContext.Provider value={{ cluster, setCluster, getExplorerUrl: explorerUrl }}>
       {children}
     </ClusterContext.Provider>
   );

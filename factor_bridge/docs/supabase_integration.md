@@ -13,6 +13,7 @@ se inyecta en Cloud Run via `--set-secrets`. En desarrollo local va en
 `factor_bridge_agent/.env`.
 
 Formato:
+
 ```
 postgresql://postgres.{proyecto}:{password}@{host}.pooler.supabase.com:5432/postgres
 ```
@@ -38,19 +39,19 @@ y `ON CONFLICT DO NOTHING`).
 
 Compradores de facturas registrados en la plataforma.
 
-| Columna | Tipo | Descripcion |
-|---|---|---|
-| id | TEXT PK | Identificador (FAC-001, FAC-002, ...) |
-| nombre | TEXT | Razon social del fondo/empresa |
-| apetito_riesgo | TEXT | conservador / balanceado / agresivo |
-| ticket_min_pen | NUMERIC | Monto minimo de factura en soles |
-| ticket_max_pen | NUMERIC | Monto maximo de factura en soles |
-| plazo_max_dias | INTEGER | Plazo maximo aceptado en dias |
-| tasa_mensual_min | NUMERIC | Tasa mensual minima (%) |
-| tasa_mensual_max | NUMERIC | Tasa mensual maxima (%) |
-| sectores | TEXT[] | Sectores que acepta. "cualquiera" = sin filtro |
-| activo | BOOLEAN | FALSE excluye al factor del matching |
-| created_at | TIMESTAMPTZ | |
+| Columna          | Tipo        | Descripcion                                    |
+| ---------------- | ----------- | ---------------------------------------------- |
+| id               | TEXT PK     | Identificador (FAC-001, FAC-002, ...)          |
+| nombre           | TEXT        | Razon social del fondo/empresa                 |
+| apetito_riesgo   | TEXT        | conservador / balanceado / agresivo            |
+| ticket_min_pen   | NUMERIC     | Monto minimo de factura en soles               |
+| ticket_max_pen   | NUMERIC     | Monto maximo de factura en soles               |
+| plazo_max_dias   | INTEGER     | Plazo maximo aceptado en dias                  |
+| tasa_mensual_min | NUMERIC     | Tasa mensual minima (%)                        |
+| tasa_mensual_max | NUMERIC     | Tasa mensual maxima (%)                        |
+| sectores         | TEXT[]      | Sectores que acepta. "cualquiera" = sin filtro |
+| activo           | BOOLEAN     | FALSE excluye al factor del matching           |
+| created_at       | TIMESTAMPTZ |                                                |
 
 Registros actuales: 4 (FAC-001 a FAC-004)
 
@@ -58,15 +59,15 @@ Registros actuales: 4 (FAC-001 a FAC-004)
 
 Empresas que venden facturas en la plataforma.
 
-| Columna | Tipo | Descripcion |
-|---|---|---|
-| id | TEXT PK | Identificador (CED-001, CED-002, ...) |
-| razon_social | TEXT | |
-| ruc | TEXT UNIQUE | RUC de 11 digitos |
-| sector | TEXT | Sector economico |
-| facturas_publicadas | INTEGER | Contador historico |
-| activo | BOOLEAN | |
-| created_at | TIMESTAMPTZ | |
+| Columna             | Tipo        | Descripcion                           |
+| ------------------- | ----------- | ------------------------------------- |
+| id                  | TEXT PK     | Identificador (CED-001, CED-002, ...) |
+| razon_social        | TEXT        |                                       |
+| ruc                 | TEXT UNIQUE | RUC de 11 digitos                     |
+| sector              | TEXT        | Sector economico                      |
+| facturas_publicadas | INTEGER     | Contador historico                    |
+| activo              | BOOLEAN     |                                       |
+| created_at          | TIMESTAMPTZ |                                       |
 
 Registros actuales: 2 (CED-001, CED-002)
 
@@ -74,21 +75,22 @@ Registros actuales: 2 (CED-001, CED-002)
 
 Identidades validadas (RUC via SUNAT, DNI via RENIEC).
 
-| Columna | Tipo | Descripcion |
-|---|---|---|
-| numero | TEXT PK | Numero de documento |
-| tipo | TEXT | RUC o DNI |
-| nombre | TEXT | Razon social (RUC) o nombre completo (DNI) |
-| estado | TEXT | ACTIVO / INACTIVO (solo RUC) |
-| condicion | TEXT | HABIDO / NO HABIDO (solo RUC) |
-| direccion | TEXT | (solo RUC) |
-| actividad | TEXT | CIIU / giro declarado (solo RUC) |
-| fuente | TEXT | seed / apis.net.pe / manual |
-| updated_at | TIMESTAMPTZ | Ultima actualizacion |
+| Columna    | Tipo        | Descripcion                                |
+| ---------- | ----------- | ------------------------------------------ |
+| numero     | TEXT PK     | Numero de documento                        |
+| tipo       | TEXT        | RUC o DNI                                  |
+| nombre     | TEXT        | Razon social (RUC) o nombre completo (DNI) |
+| estado     | TEXT        | ACTIVO / INACTIVO (solo RUC)               |
+| condicion  | TEXT        | HABIDO / NO HABIDO (solo RUC)              |
+| direccion  | TEXT        | (solo RUC)                                 |
+| actividad  | TEXT        | CIIU / giro declarado (solo RUC)           |
+| fuente     | TEXT        | seed / apis.net.pe / manual                |
+| updated_at | TIMESTAMPTZ | Ultima actualizacion                       |
 
 Registros actuales: 6 (4 RUC + 2 DNI)
 
 Flujo de `validate_identity`:
+
 1. Busca el documento en esta tabla
 2. Si no existe y `APIS_NET_PE_TOKEN` esta configurado, consulta SUNAT/RENIEC
    y persiste el resultado con `fuente = 'apis.net.pe'`
@@ -96,6 +98,7 @@ Flujo de `validate_identity`:
    de agregar el documento manualmente
 
 Agregar un documento manualmente:
+
 ```sql
 INSERT INTO documentos (numero, tipo, nombre, estado, condicion, direccion, actividad, fuente)
 VALUES ('20123456789', 'RUC', 'EMPRESA EJEMPLO S.A.C.', 'ACTIVO', 'HABIDO',
@@ -106,18 +109,18 @@ VALUES ('20123456789', 'RUC', 'EMPRESA EJEMPLO S.A.C.', 'ACTIVO', 'HABIDO',
 
 Perfiles crediticios de pagadores.
 
-| Columna | Tipo | Descripcion |
-|---|---|---|
-| numero | TEXT PK | DNI o RUC del pagador |
-| score | INTEGER | 300 a 850 |
-| banda_riesgo | TEXT | VERDE / AMARILLO / ROJO |
-| morosidad_activa | BOOLEAN | |
-| lista_negra_sbs | BOOLEAN | |
-| sunat_no_habido | BOOLEAN | |
-| deuda_pen | NUMERIC | Deuda estimada en soles |
-| dias_mora | INTEGER | Promedio de dias de mora |
-| fuente | TEXT | seed / manual / buro-externo |
-| updated_at | TIMESTAMPTZ | |
+| Columna          | Tipo        | Descripcion                  |
+| ---------------- | ----------- | ---------------------------- |
+| numero           | TEXT PK     | DNI o RUC del pagador        |
+| score            | INTEGER     | 300 a 850                    |
+| banda_riesgo     | TEXT        | VERDE / AMARILLO / ROJO      |
+| morosidad_activa | BOOLEAN     |                              |
+| lista_negra_sbs  | BOOLEAN     |                              |
+| sunat_no_habido  | BOOLEAN     |                              |
+| deuda_pen        | NUMERIC     | Deuda estimada en soles      |
+| dias_mora        | INTEGER     | Promedio de dias de mora     |
+| fuente           | TEXT        | seed / manual / buro-externo |
+| updated_at       | TIMESTAMPTZ |                              |
 
 Registros actuales: 6
 
@@ -127,6 +130,7 @@ Esto es solo para desarrollo; en produccion se debe integrar Equifax, Sentinel
 o SBS y persistir el resultado con `fuente = 'buro-externo'`.
 
 Agregar o actualizar un score manualmente:
+
 ```sql
 INSERT INTO credit_scores (numero, score, banda_riesgo, morosidad_activa, lista_negra_sbs, sunat_no_habido, deuda_pen, dias_mora, fuente)
 VALUES ('20987654321', 750, 'VERDE', FALSE, FALSE, FALSE, 0, 0, 'manual')
@@ -140,14 +144,14 @@ ON CONFLICT (numero) DO UPDATE SET
 
 Registro de operaciones iniciadas (vender / comprar factura).
 
-| Columna | Tipo | Descripcion |
-|---|---|---|
-| intent_id | TEXT PK | Generado por el agente (INT-XXXXXXXX) |
-| actor_role | TEXT | cedente o factor |
-| actor_document | TEXT | RUC o DNI del actor |
-| payload | TEXT | JSON con detalles de la operacion |
-| status | TEXT | pending_match (unico valor actual) |
-| created_at | TIMESTAMPTZ | |
+| Columna        | Tipo        | Descripcion                           |
+| -------------- | ----------- | ------------------------------------- |
+| intent_id      | TEXT PK     | Generado por el agente (INT-XXXXXXXX) |
+| actor_role     | TEXT        | cedente o factor                      |
+| actor_document | TEXT        | RUC o DNI del actor                   |
+| payload        | TEXT        | JSON con detalles de la operacion     |
+| status         | TEXT        | pending_match (unico valor actual)    |
+| created_at     | TIMESTAMPTZ |                                       |
 
 Cada llamada exitosa a `register_intent` escribe una fila aqui.
 
@@ -187,6 +191,7 @@ register_intent(role, document, payload_json)
 ## Agregar datos de produccion
 
 Para un nuevo factor real:
+
 ```sql
 INSERT INTO factores (id, nombre, apetito_riesgo, ticket_min_pen, ticket_max_pen,
                       plazo_max_dias, tasa_mensual_min, tasa_mensual_max, sectores)
@@ -195,11 +200,13 @@ VALUES ('FAC-005', 'Nuevo Fondo Capital S.A.', 'balanceado',
 ```
 
 Para deshabilitar un factor sin borrarlo:
+
 ```sql
 UPDATE factores SET activo = FALSE WHERE id = 'FAC-003';
 ```
 
 Para actualizar un score cuando llega respuesta de un buro real:
+
 ```sql
 INSERT INTO credit_scores (numero, score, banda_riesgo, morosidad_activa,
                            lista_negra_sbs, sunat_no_habido, deuda_pen, dias_mora, fuente)

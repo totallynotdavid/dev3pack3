@@ -1,6 +1,13 @@
 "use client";
 
-import { useState, useRef, useEffect, type KeyboardEvent, type FormEvent, type ChangeEvent } from "react";
+import {
+  useState,
+  useRef,
+  useEffect,
+  type KeyboardEvent,
+  type FormEvent,
+  type ChangeEvent,
+} from "react";
 import { cn } from "@/lib/utils";
 import { useUser } from "@clerk/nextjs";
 
@@ -33,12 +40,12 @@ async function queryAgent(message: string, sessionId: string): Promise<string> {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Cache-Control": "no-cache"
+        "Cache-Control": "no-cache",
       },
       body: JSON.stringify({
         message: message,
         session_id: sessionId,
-        user_id: "marketplace-user"
+        user_id: "marketplace-user",
       }),
     });
 
@@ -69,9 +76,7 @@ export function Chatbot() {
 
   useEffect(() => {
     // Generate a unique session ID for this user's chatbot session
-    const newSessionId = user?.id
-      ? `user-${user.id}-${Date.now()}`
-      : `anon-${Date.now()}`;
+    const newSessionId = user?.id ? `user-${user.id}-${Date.now()}` : `anon-${Date.now()}`;
     setSessionId(newSessionId);
   }, [user?.id]);
 
@@ -154,19 +159,13 @@ export function Chatbot() {
             </svg>
           </div>
           <div>
-            <p className="text-sm font-semibold leading-none text-foreground">
-              Sentinel AI
-            </p>
-            <p className="mt-0.5 text-[11px] text-muted-foreground">
-              Investment advisor
-            </p>
+            <p className="text-sm font-semibold leading-none text-foreground">Sentinel AI</p>
+            <p className="mt-0.5 text-[11px] text-muted-foreground">Investment advisor</p>
           </div>
         </div>
         <div className="flex items-center gap-1.5">
           <span className="h-1.5 w-1.5 rounded-full bg-success" />
-          <span className="text-[11px] font-medium text-muted-foreground">
-            Online
-          </span>
+          <span className="text-[11px] font-medium text-muted-foreground">Online</span>
         </div>
       </div>
 
@@ -176,17 +175,12 @@ export function Chatbot() {
           {messages.map((msg) => (
             <div
               key={msg.id}
-              className={cn(
-                "flex gap-2.5",
-                msg.role === "user" ? "flex-row-reverse" : "flex-row",
-              )}
+              className={cn("flex gap-2.5", msg.role === "user" ? "flex-row-reverse" : "flex-row")}
             >
               <div
                 className={cn(
                   "flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-md text-[10px] font-bold tracking-widest",
-                  msg.role === "assistant"
-                    ? "bg-foreground text-white"
-                    : "bg-brand text-white",
+                  msg.role === "assistant" ? "bg-foreground text-white" : "bg-brand text-white",
                 )}
                 aria-hidden
               >
@@ -226,7 +220,6 @@ export function Chatbot() {
               </div>
             </div>
           )}
-
         </div>
       </div>
 
@@ -274,11 +267,7 @@ export function Chatbot() {
               aria-hidden
             >
               <path d="M22 2L11 13" strokeLinecap="round" strokeLinejoin="round" />
-              <path
-                d="M22 2L15 22L11 13L2 9L22 2Z"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
+              <path d="M22 2L15 22L11 13L2 9L22 2Z" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
         </form>

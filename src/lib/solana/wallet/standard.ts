@@ -13,16 +13,11 @@ import {
   type SolanaSignAndSendTransactionFeature,
 } from "@solana/wallet-standard-features";
 import type { Address } from "@solana/kit";
-import type {
-  WalletConnector,
-  WalletConnectorMetadata,
-  WalletSession,
-} from "./types";
+import type { WalletConnector, WalletConnectorMetadata, WalletSession } from "./types";
 
 function isSolanaWallet(wallet: StandardWallet): boolean {
   return (
-    StandardConnect in wallet.features &&
-    wallet.chains.some((chain) => chain.startsWith("solana:"))
+    StandardConnect in wallet.features && wallet.chains.some((chain) => chain.startsWith("solana:"))
   );
 }
 
@@ -40,7 +35,7 @@ function createConnector(wallet: StandardWallet): WalletConnector {
         StandardConnect
       ] as StandardConnectFeature[typeof StandardConnect];
       const { accounts } = await connectFeature.connect(
-        options?.silent ? { silent: true } : undefined
+        options?.silent ? { silent: true } : undefined,
       );
 
       const account = accounts[0] ?? wallet.accounts[0];
@@ -104,9 +99,7 @@ export function discoverWallets(): WalletConnector[] {
   return get().filter(isSolanaWallet).map(createConnector);
 }
 
-export function watchWallets(
-  onChange: (connectors: WalletConnector[]) => void
-): () => void {
+export function watchWallets(onChange: (connectors: WalletConnector[]) => void): () => void {
   const wallets = getWallets();
 
   function update() {

@@ -64,9 +64,7 @@ export default async function ContractDetailPage({ params }: { params: Promise<{
   const offerList = await getContractOffers(contract.id);
   const daysUntilDue = Math.max(
     0,
-    Math.floor(
-      (new Date(contract.dueDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24),
-    ),
+    Math.floor((new Date(contract.dueDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24)),
   );
 
   const isOpen = contract.status === "active" || contract.status === "under_negotiation";
@@ -183,9 +181,7 @@ export default async function ContractDetailPage({ params }: { params: Promise<{
               </div>
             ) : (
               <div className="sticky top-32 rounded-lg border border-border bg-card p-7 text-center shadow-soft">
-                <p className="font-display text-xl text-foreground">
-                  No longer accepting offers
-                </p>
+                <p className="font-display text-xl text-foreground">No longer accepting offers</p>
                 <p className="mt-3 text-sm text-muted-foreground">
                   This contract is currently {contract.status.replace(/_/g, " ")}.
                 </p>

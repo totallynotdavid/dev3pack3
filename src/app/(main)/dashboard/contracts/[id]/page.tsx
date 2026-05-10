@@ -12,10 +12,7 @@ import { OfferStatusBadge } from "@/ui/components/marketplace/offer-status-badge
 import { SellerOfferActions } from "@/ui/components/marketplace/seller-offer-actions";
 
 async function getContractWithOffers(contractId: string, sellerId: string) {
-  const [contract] = await db
-    .select()
-    .from(contracts)
-    .where(eq(contracts.id, contractId));
+  const [contract] = await db.select().from(contracts).where(eq(contracts.id, contractId));
 
   if (!contract || contract.sellerId !== sellerId) return null;
 
@@ -59,9 +56,7 @@ export default async function SellerContractDetailPage({
     Math.floor((new Date(contract.dueDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24)),
   );
 
-  const pendingOffers = offerList.filter(
-    (o) => o.status === "pending" || o.status === "countered",
-  );
+  const pendingOffers = offerList.filter((o) => o.status === "pending" || o.status === "countered");
 
   return (
     <div className="relative">
@@ -156,8 +151,7 @@ export default async function SellerContractDetailPage({
                     </span>
                   </div>
                   <h2 className="font-display text-3xl tracking-tighter text-foreground">
-                    Offers{" "}
-                    <span className="text-muted-foreground">({offerList.length})</span>
+                    Offers <span className="text-muted-foreground">({offerList.length})</span>
                   </h2>
                 </div>
                 {pendingOffers.length > 0 && (
@@ -231,10 +225,7 @@ export default async function SellerContractDetailPage({
                         </p>
 
                         {canAct && (
-                          <SellerOfferActions
-                            contractId={contract.id}
-                            offerId={offer.id}
-                          />
+                          <SellerOfferActions contractId={contract.id} offerId={offer.id} />
                         )}
                       </div>
                     );
@@ -283,7 +274,7 @@ export default async function SellerContractDetailPage({
                 className="flex items-center justify-between rounded-lg border border-border bg-card px-6 py-4 text-sm font-medium text-muted-foreground shadow-soft transition-colors hover:bg-secondary hover:text-foreground"
               >
                 View in marketplace
-                <Icon icon="solar:arrow-right-up-linear" className="text-base" />
+                <Icon icon="solar:arrow-right-linear" className="text-base" />
               </Link>
             </div>
           </aside>

@@ -10,9 +10,7 @@ export async function ContractsList() {
         <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-muted">
           <span className="h-2.5 w-2.5 bg-brand" aria-hidden />
         </div>
-        <p className="font-display text-2xl text-foreground">
-          No contracts available yet.
-        </p>
+        <p className="font-display text-2xl text-foreground">No contracts available yet.</p>
         <p className="mt-2 text-sm text-muted-foreground">
           New listings appear here as soon as sellers post them.
         </p>

@@ -10,16 +10,11 @@ export function SolanaClientProvider({ children }: { children: ReactNode }) {
   const { cluster } = useCluster();
   const client = useMemo(() => createSolanaClient(cluster), [cluster]);
 
-  return (
-    <SolanaClientContext.Provider value={client}>
-      {children}
-    </SolanaClientContext.Provider>
-  );
+  return <SolanaClientContext.Provider value={client}>{children}</SolanaClientContext.Provider>;
 }
 
 export function useSolanaClient() {
   const client = useContext(SolanaClientContext);
-  if (!client)
-    throw new Error("useSolanaClient must be used within SolanaClientProvider");
+  if (!client) throw new Error("useSolanaClient must be used within SolanaClientProvider");
   return client;
 }

@@ -44,7 +44,8 @@ export default async function DashboardPage() {
           eyebrow="Operations"
           title={
             <>
-              Welcome back, <span className="italic text-brand">{user.fullName?.split(" ")[0] || "trader"}</span>.
+              Welcome back,{" "}
+              <span className="italic text-brand">{user.fullName?.split(" ")[0] || "trader"}</span>.
             </>
           }
           description="Track your contracts, monitor open offers, and manage settlement in one place."
@@ -174,9 +175,7 @@ export default async function DashboardPage() {
                   Buy Side
                 </span>
               </div>
-              <h2 className="font-display text-3xl tracking-tighter text-foreground">
-                My Offers
-              </h2>
+              <h2 className="font-display text-3xl tracking-tighter text-foreground">My Offers</h2>
             </div>
 
             {myOffers.length === 0 ? (

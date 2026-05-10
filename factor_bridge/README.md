@@ -3,6 +3,7 @@
 Agente intermediario bilateral para operaciones de **factoring** (compra-venta de facturas) construido sobre **Google Agent Development Kit (ADK) v1.33+** con metodologia **ReAct**.
 
 Conecta:
+
 - **Cedentes** (vendedores de facturas que necesitan liquidez)
 - **Factores** (compradores/inversionistas que asumen el riesgo)
 - Evalua la salud financiera del **Pagador** (deudor real, fuente de riesgo) usando fuentes peruanas (SUNAT, RENIEC, perfil crediticio).
@@ -11,12 +12,12 @@ Conecta:
 
 ## Stack
 
-| Componente | Version |
-|---|---|
-| Python | 3.10+ |
-| google-adk | 1.33.0 (con extensions para LiteLLM) |
-| Seleccion de modelo | Variable `MODEL_PROVIDER` en `.env` |
-| Proveedores soportados | OpenRouter, Hugging Face |
+| Componente             | Version                              |
+| ---------------------- | ------------------------------------ |
+| Python                 | 3.10+                                |
+| google-adk             | 1.33.0 (con extensions para LiteLLM) |
+| Seleccion de modelo    | Variable `MODEL_PROVIDER` en `.env`  |
+| Proveedores soportados | OpenRouter, Hugging Face             |
 
 ---
 
@@ -49,6 +50,7 @@ Obtén tu API key en https://openrouter.ai/keys
 ```bash
 adk web
 ```
+
 Abre `http://localhost:8000` y selecciona `factor_bridge_agent`.
 Veras trazas de herramientas, estado de sesion y el razonamiento del modelo.
 
@@ -108,11 +110,11 @@ factor_bridge/
 
 El proveedor se controla con `MODEL_PROVIDER` en `factor_bridge_agent/.env`:
 
-| MODEL_PROVIDER | Modelo | Costo | Requisito |
-|---|---|---|---|
-| `openrouter` (default) | `llama-3.3-70b-instruct:free` | Gratis | `OPENROUTER_API_KEY` |
-| `openrouter_claude` | `claude-sonnet-4.6` | $3/M tokens | `OPENROUTER_API_KEY` + credito |
-| `huggingface` | `Llama-3.1-8B-Instruct` | Gratis | `HUGGINGFACE_API_KEY` |
+| MODEL_PROVIDER         | Modelo                        | Costo       | Requisito                      |
+| ---------------------- | ----------------------------- | ----------- | ------------------------------ |
+| `openrouter` (default) | `llama-3.3-70b-instruct:free` | Gratis      | `OPENROUTER_API_KEY`           |
+| `openrouter_claude`    | `claude-sonnet-4.6`           | $3/M tokens | `OPENROUTER_API_KEY` + credito |
+| `huggingface`          | `Llama-3.1-8B-Instruct`       | Gratis      | `HUGGINGFACE_API_KEY`          |
 
 Para cambiar de proveedor sin reiniciar el codigo, edita `.env` y reinicia `adk`:
 

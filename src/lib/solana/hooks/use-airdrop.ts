@@ -30,13 +30,12 @@ export function useAirdrop() {
         console.error("Airdrop error:", error);
 
         const msg = error?.message || String(error);
-        const isRateLimited =
-          msg.includes("429") || msg.includes("Internal JSON-RPC error");
+        const isRateLimited = msg.includes("429") || msg.includes("Internal JSON-RPC error");
 
         toast.error(
           isRateLimited
             ? "Devnet faucet rate-limited. Use the web faucet instead: https://faucet.solana.com"
-            : "Airdrop failed. Try again later."
+            : "Airdrop failed. Try again later.",
         );
 
         throw error;
@@ -44,7 +43,7 @@ export function useAirdrop() {
         setIsAirdropping(false);
       }
     },
-    [client, cluster]
+    [client, cluster],
   );
 
   return { requestAirdrop, isAirdropping };

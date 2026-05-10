@@ -22,14 +22,18 @@ export async function PATCH(
 
     const contract = await getContractById(contractId);
     if (!contract) return NextResponse.json({ error: "Contract not found" }, { status: 404 });
-    if (contract.sellerId !== userId) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    if (contract.sellerId !== userId)
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
     const offer = await getOfferById(offerId);
     if (!offer || offer.contractId !== contractId) {
       return NextResponse.json({ error: "Offer not found" }, { status: 404 });
     }
     if (offer.status !== "pending" && offer.status !== "countered") {
-      return NextResponse.json({ error: "Offer cannot be actioned in its current state" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Offer cannot be actioned in its current state" },
+        { status: 400 },
+      );
     }
 
     if (action === "accept") {

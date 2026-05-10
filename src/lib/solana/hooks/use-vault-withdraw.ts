@@ -35,9 +35,7 @@ export function useVaultWithdraw() {
       return null;
     } catch (error) {
       console.error("Withdraw error:", error);
-      toast.error(
-        error instanceof Error ? error.message : "Withdraw failed"
-      );
+      toast.error(error instanceof Error ? error.message : "Withdraw failed");
       throw error;
     }
   }, [wallet, send]);

@@ -45,12 +45,10 @@ export function WalletProvider({ children }: PropsWithChildren) {
   const chain = `solana:${cluster}`;
 
   const [connectors, setConnectors] = useState<WalletConnector[]>(() =>
-    typeof window === "undefined" ? [] : discoverWallets()
+    typeof window === "undefined" ? [] : discoverWallets(),
   );
   const [session, setSession] = useState<WalletSession | undefined>();
-  const [status, setStatus] = useState<WalletStatus>(
-    WALLET_STATUS.DISCONNECTED
-  );
+  const [status, setStatus] = useState<WalletStatus>(WALLET_STATUS.DISCONNECTED);
   const [error, setError] = useState<unknown>();
   const isReady = typeof window !== "undefined";
 
@@ -123,7 +121,7 @@ export function WalletProvider({ children }: PropsWithChildren) {
 
   const signer = useMemo(
     () => (session ? createWalletSigner(session, chain) : undefined),
-    [session, chain]
+    [session, chain],
   );
 
   const value = useMemo<WalletContextValue>(
@@ -137,12 +135,10 @@ export function WalletProvider({ children }: PropsWithChildren) {
       disconnect,
       isReady,
     }),
-    [connectors, status, session, signer, error, connect, disconnect, isReady]
+    [connectors, status, session, signer, error, connect, disconnect, isReady],
   );
 
-  return (
-    <WalletContext.Provider value={value}>{children}</WalletContext.Provider>
-  );
+  return <WalletContext.Provider value={value}>{children}</WalletContext.Provider>;
 }
 
 export function useWallet() {

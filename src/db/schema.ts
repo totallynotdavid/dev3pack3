@@ -1,8 +1,26 @@
-import { pgTable, text, bigint, uuid, date, timestamp, varchar, index, integer, boolean, jsonb } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  text,
+  bigint,
+  uuid,
+  date,
+  timestamp,
+  varchar,
+  index,
+  integer,
+  boolean,
+  jsonb,
+} from "drizzle-orm/pg-core";
 import { relations, type InferSelectModel } from "drizzle-orm";
 
 export type ContractStatus = "active" | "under_negotiation" | "sold" | "expired" | "cancelled";
-export type OfferStatus = "pending" | "countered" | "accepted" | "rejected" | "expired" | "withdrawn";
+export type OfferStatus =
+  | "pending"
+  | "countered"
+  | "accepted"
+  | "rejected"
+  | "expired"
+  | "withdrawn";
 export type RiskCategory = "low" | "medium" | "high";
 export type TransactionType = "deposit" | "hold" | "release" | "settle" | "withdraw";
 

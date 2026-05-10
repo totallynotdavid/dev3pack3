@@ -22,8 +22,8 @@ export function SentinelHero() {
           </h1>
 
           <p className="mb-10 max-w-md text-base leading-relaxed text-muted-foreground sm:text-lg">
-            Buy government pending-payment contracts at the best rates. Negotiate
-            securely with instant escrow settlement and live risk grading.
+            Buy government pending-payment contracts at the best rates. Negotiate securely with
+            instant escrow settlement and live risk grading.
           </p>
 
           <div className="mb-14 flex flex-wrap items-center gap-4">
@@ -54,16 +54,15 @@ export function SentinelHero() {
               icon="solar:shield-check-linear"
               className="mt-0.5 shrink-0 text-xl text-muted-foreground"
             />
-            Protecting working capital across global supply chains <br className="hidden sm:block" />
+            Protecting working capital across global supply chains{" "}
+            <br className="hidden sm:block" />
             and public-sector receivables.
           </p>
         </div>
 
         {/* Right column — graphic */}
         <div className="relative flex justify-center lg:col-span-7 lg:justify-end">
-          <div
-            className="relative flex aspect-[4/3] w-full max-w-[800px] items-center justify-center overflow-hidden rounded-2xl border border-border bg-card shadow-soft bg-dot-grid"
-          >
+          <div className="relative flex aspect-[4/3] w-full max-w-[800px] items-center justify-center overflow-hidden rounded-2xl border border-border bg-card shadow-soft bg-dot-grid">
             {/* Decorative orange corner */}
             <div className="absolute bottom-0 right-0 z-0 h-1/2 w-1/2 translate-x-1/4 translate-y-1/4 rounded-tl-[4rem] bg-brand opacity-90" />
             <div className="pointer-events-none absolute bottom-0 right-0 z-0 h-1/3 w-full bg-gradient-to-t from-card to-transparent" />
@@ -129,9 +128,7 @@ export function SentinelHero() {
                   </linearGradient>
                 </defs>
               </svg>
-              <div className="text-3xl font-medium tracking-tighter text-foreground">
-                12s
-              </div>
+              <div className="text-3xl font-medium tracking-tighter text-foreground">12s</div>
             </div>
 
             {/* Floating card — bottom left */}
@@ -156,16 +153,12 @@ export function SentinelHero() {
                 ))}
               </div>
               <div className="flex items-end justify-between">
-                <div className="text-3xl font-medium tracking-tighter text-foreground">
-                  8,432
-                </div>
+                <div className="text-3xl font-medium tracking-tighter text-foreground">8,432</div>
                 <div className="mb-1 flex items-center gap-1 text-xs font-medium text-brand">
                   <Icon icon="solar:arrow-up-linear" /> 24%
                 </div>
               </div>
-              <div className="mt-1 text-[10px] text-muted-foreground">
-                vs previous month
-              </div>
+              <div className="mt-1 text-[10px] text-muted-foreground">vs previous month</div>
             </div>
           </div>
         </div>

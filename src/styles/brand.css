@@ -9,39 +9,39 @@
 
 :root {
   /* Surfaces */
-  --background: #FDFDFD;
-  --card: #FFFFFF;
-  --popover: #FFFFFF;
-  --secondary: #F4F4F5;
-  --muted: #F3F4F6;
-  --accent-bg: #FFF1EC;
+  --background: #fdfdfd;
+  --card: #ffffff;
+  --popover: #ffffff;
+  --secondary: #f4f4f5;
+  --muted: #f3f4f6;
+  --accent-bg: #fff1ec;
 
   /* Text */
   --foreground: #121212;
   --card-foreground: #121212;
   --popover-foreground: #121212;
   --secondary-foreground: #121212;
-  --muted-foreground: #6B7280;
-  --accent-foreground: #FF5722;
+  --muted-foreground: #6b7280;
+  --accent-foreground: #ff5722;
 
   /* Brand action */
   --primary: #121212;
-  --primary-foreground: #FFFFFF;
+  --primary-foreground: #ffffff;
 
   /* Brand accent */
-  --brand: #FF5722;
-  --brand-foreground: #FFFFFF;
+  --brand: #ff5722;
+  --brand-foreground: #ffffff;
 
   /* Semantic */
-  --destructive: #DC2626;
-  --destructive-foreground: #FFFFFF;
-  --success: #16A34A;
-  --success-foreground: #FFFFFF;
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  --success: #16a34a;
+  --success-foreground: #ffffff;
 
   /* Lines */
-  --border: #F3F4F6;
-  --border-strong: #E5E7EB;
-  --input: #E5E7EB;
+  --border: #f3f4f6;
+  --border-strong: #e5e7eb;
+  --input: #e5e7eb;
   --ring: #121212;
 
   /* Radius — Sentinel scale: 2,4,8,16,32 */
@@ -57,13 +57,17 @@
 }
 
 @keyframes skeleton-fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 /* Dotted grid background — used on hero + section frames */
 .bg-dot-grid {
-  background-image: radial-gradient(circle at 1px 1px, #E5E7EB 1px, transparent 0);
+  background-image: radial-gradient(circle at 1px 1px, #e5e7eb 1px, transparent 0);
   background-size: 24px 24px;
 }
 
@@ -77,5 +81,5 @@
 
 ::selection {
   background: var(--brand);
-  color: #FFFFFF;
+  color: #ffffff;
 }

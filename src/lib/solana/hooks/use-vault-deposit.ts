@@ -38,13 +38,11 @@ export function useVaultDeposit() {
         return null;
       } catch (error) {
         console.error("Deposit error:", error);
-        toast.error(
-          error instanceof Error ? error.message : "Deposit failed"
-        );
+        toast.error(error instanceof Error ? error.message : "Deposit failed");
         throw error;
       }
     },
-    [wallet, send]
+    [wallet, send],
   );
 
   return { deposit, isDepositing: isSending };

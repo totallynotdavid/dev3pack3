@@ -12,9 +12,7 @@ interface ContractCardProps {
 export function ContractCard({ contract }: ContractCardProps) {
   const daysUntilDue = Math.max(
     0,
-    Math.floor(
-      (new Date(contract.dueDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24),
-    ),
+    Math.floor((new Date(contract.dueDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24)),
   );
 
   return (
@@ -35,9 +33,7 @@ export function ContractCard({ contract }: ContractCardProps) {
         <h3 className="mb-1 font-display text-2xl leading-tight tracking-tighter text-foreground line-clamp-2">
           {contract.debtorName}
         </h3>
-        <p className="mb-8 text-sm font-medium text-muted-foreground">
-          Government receivable
-        </p>
+        <p className="mb-8 text-sm font-medium text-muted-foreground">Government receivable</p>
 
         {/* Spacer */}
         <div className="flex-1" />
@@ -58,9 +54,7 @@ export function ContractCard({ contract }: ContractCardProps) {
             </p>
             <p className="font-display text-2xl tracking-tighter text-foreground">
               {daysUntilDue}
-              <span className="ml-1 text-sm font-medium font-sans text-muted-foreground">
-                days
-              </span>
+              <span className="ml-1 text-sm font-medium font-sans text-muted-foreground">days</span>
             </p>
           </div>
         </div>

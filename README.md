@@ -5,6 +5,7 @@ Sistema completo de factoraje de contratos gubernamentales con integración de *
 ## 🎯 Características Principales
 
 ### Marketplace de Factoring
+
 - ✅ Publicación de contratos gubernamentales
 - ✅ Sistema de ofertas y contraofertas
 - ✅ Negociación con deadline de 7 días
@@ -13,6 +14,7 @@ Sistema completo de factoraje de contratos gubernamentales con integración de *
 - ✅ Dashboard de usuario con historial
 
 ### Integración Solana
+
 - ✅ Multi-cluster support (devnet/testnet/mainnet/localnet)
 - ✅ Wallet connection (Phantom, Solflare, Backpack)
 - ✅ Balance en tiempo real con WebSocket
@@ -21,6 +23,7 @@ Sistema completo de factoraje de contratos gubernamentales con integración de *
 - ✅ UI completa de administración de vault
 
 ### FactorBridge AI Agent
+
 - ✅ Validación de RUC/DNI (SUNAT/RENIEC)
 - ✅ Credit scoring (0-850)
 - ✅ Banda de riesgo (VERDE/AMARILLO/ROJO)
@@ -30,6 +33,7 @@ Sistema completo de factoraje de contratos gubernamentales con integración de *
 ## 🚀 Quick Start
 
 ### 1. Requisitos
+
 - Node.js 18+ o Bun
 - PostgreSQL o cuenta de Supabase
 - Cuenta de Clerk (auth)
@@ -84,6 +88,7 @@ NEXT_PUBLIC_AGENT_API_URL=https://factor-bridge-agent-197950168142.us-central1.r
 ## 📱 Funcionalidades por Pantalla
 
 ### `/marketplace`
+
 - Listado de contratos activos
 - Filtros por riesgo y monto
 - Chatbot FactorBridge AI
@@ -91,23 +96,27 @@ NEXT_PUBLIC_AGENT_API_URL=https://factor-bridge-agent-197950168142.us-central1.r
 - Wallet connection
 
 ### `/contracts/new`
+
 - Formulario de publicación de contratos
 - Upload de documentos (Vercel Blob)
 - Validación de campos
 - Preview antes de publicar
 
 ### `/marketplace/[id]`
+
 - Detalles del contrato
 - Panel de ofertas
 - Formulario para hacer oferta
 - Historial de negociación
 
 ### `/dashboard`
+
 - Resumen de contratos propios
 - Resumen de ofertas realizadas
 - Estadísticas de actividad
 
 ### `/dashboard/wallet`
+
 - **Balance Fiat** (Stripe)
   - Depósito con tarjeta
   - Historial de transacciones
@@ -121,6 +130,7 @@ NEXT_PUBLIC_AGENT_API_URL=https://factor-bridge-agent-197950168142.us-central1.r
   - Link a explorer
 
 ### `/dashboard/contracts/[id]`
+
 - Gestión de contrato propio
 - Ver todas las ofertas recibidas
 - Aceptar/Rechazar/Contrariar ofertas
@@ -134,7 +144,7 @@ El sistema detecta automáticamente las wallets instaladas:
 
 ```tsx
 // Conectar wallet
-<WalletButton />
+<WalletButton />;
 
 // Usar en componentes
 const { wallet, status, connect, disconnect } = useWallet();
@@ -192,9 +202,9 @@ El chatbot está preintegrado en `/marketplace`:
 
 ```tsx
 // Preguntas rápidas disponibles:
-- "¿Qué contratos de bajo riesgo hay?"
-- "Evalúa el RUC 20512345678"
-- "¿Cómo funciona el factoraje?"
+-"¿Qué contratos de bajo riesgo hay?" -
+  "Evalúa el RUC 20512345678" -
+  "¿Cómo funciona el factoraje?";
 ```
 
 ### Capacidades del Agente
@@ -505,6 +515,7 @@ Propietario - Todos los derechos reservados
 ## 📞 Soporte
 
 Para soporte técnico:
+
 - Email: support@sentinel.com
 - Discord: [Sentinel Community](#)
 - GitHub Issues: [Ver Issues](#)

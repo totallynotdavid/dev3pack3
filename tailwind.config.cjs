@@ -70,16 +70,12 @@ module.exports = {
         tighter: "-0.025em",
       },
       fontSize: {
-        display: [
-          "72px",
-          { lineHeight: "1", letterSpacing: "-0.025em", fontWeight: "400" },
-        ],
+        display: ["72px", { lineHeight: "1", letterSpacing: "-0.025em", fontWeight: "400" }],
       },
       boxShadow: {
         card: "0 15px 35px -5px rgba(0, 0, 0, 0.1)",
         soft: "0 20px 60px -15px rgba(0, 0, 0, 0.05)",
-        press:
-          "inset 0 2px 0 rgba(255, 255, 255, 1), 0 10px 30px rgba(0, 0, 0, 0.1)",
+        press: "inset 0 2px 0 rgba(255, 255, 255, 1), 0 10px 30px rgba(0, 0, 0, 0.1)",
         "lens-inset": "inset 0 4px 10px rgba(0, 0, 0, 0.05)",
         "lens-deep": "inset 0 10px 20px rgba(0, 0, 0, 0.5)",
       },
@@ -107,7 +103,7 @@ module.exports = {
           "50%": { transform: "scale(1.4)" },
           "100%": { transform: "scale(1)" },
         },
-        "breathe": {
+        breathe: {
           "0%, 100%": { opacity: "0.85" },
           "50%": { opacity: "1" },
         },
@@ -118,7 +114,7 @@ module.exports = {
         "skeleton-delayed": "skeleton-fade-in 0.2s ease-in 0.25s forwards",
         "skeleton-delayed-long": "skeleton-fade-in 0.2s ease-in 0.4s forwards",
         "cart-badge-pop": "cart-badge-pop 0.3s ease-out",
-        "breathe": "breathe 4s cubic-bezier(0.4, 0, 0.2, 1) infinite",
+        breathe: "breathe 4s cubic-bezier(0.4, 0, 0.2, 1) infinite",
       },
       transitionTimingFunction: {
         sentinel: "cubic-bezier(0.4, 0, 0.2, 1)",

@@ -4,7 +4,10 @@ interface ContractStatusBadgeProps {
   status: ContractStatus;
 }
 
-const statusConfig: Record<ContractStatus, { label: string; dot: string; bg: string; text: string }> = {
+const statusConfig: Record<
+  ContractStatus,
+  { label: string; dot: string; bg: string; text: string }
+> = {
   active: {
     label: "Active",
     dot: "bg-brand",

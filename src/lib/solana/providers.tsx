@@ -9,9 +9,7 @@ export function SolanaProviders({ children }: { children: ReactNode }) {
   return (
     <ClusterProvider>
       <SolanaClientProvider>
-        <WalletProvider>
-          {children}
-        </WalletProvider>
+        <WalletProvider>{children}</WalletProvider>
       </SolanaClientProvider>
     </ClusterProvider>
   );

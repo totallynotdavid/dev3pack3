@@ -7,13 +7,13 @@ Estado: produccion activa con Hugging Face / Qwen 2.5 7B
 
 ## Configuracion activa
 
-| Variable | Valor |
-|---|---|
-| `MODEL_PROVIDER` | `huggingface` |
-| Modelo | `Qwen/Qwen2.5-7B-Instruct` |
-| Provider LiteLLM | `huggingface/Qwen/Qwen2.5-7B-Instruct` |
-| Endpoint | HF Serverless Inference API (gratuito) |
-| Token | `HUGGINGFACE_API_KEY` en Secret Manager |
+| Variable         | Valor                                   |
+| ---------------- | --------------------------------------- |
+| `MODEL_PROVIDER` | `huggingface`                           |
+| Modelo           | `Qwen/Qwen2.5-7B-Instruct`              |
+| Provider LiteLLM | `huggingface/Qwen/Qwen2.5-7B-Instruct`  |
+| Endpoint         | HF Serverless Inference API (gratuito)  |
+| Token            | `HUGGINGFACE_API_KEY` en Secret Manager |
 
 Para cambiar de proveedor basta con actualizar `MODEL_PROVIDER` en Cloud Run
 o en `factor_bridge_agent/.env` para desarrollo local. No se requiere ningun
@@ -23,12 +23,12 @@ otro cambio en el codigo.
 
 ## Providers disponibles
 
-| `MODEL_PROVIDER` | Modelo | Tool calling | Rate limit | Costo |
-|---|---|---|---|---|
-| `huggingface` | Qwen/Qwen2.5-7B-Instruct | Funcional | Sin limite practico | $0 |
-| `huggingface_llama` | meta-llama/Llama-3.1-8B-Instruct | No confiable | Sin limite | $0 |
-| `openrouter` | llama-3.3-70b-instruct:free | Correcto | 200 req/dia | $0 |
-| `openrouter_claude` | anthropic/claude-sonnet-4.6 | Correcto | Alto | Pago |
+| `MODEL_PROVIDER`    | Modelo                           | Tool calling | Rate limit          | Costo |
+| ------------------- | -------------------------------- | ------------ | ------------------- | ----- |
+| `huggingface`       | Qwen/Qwen2.5-7B-Instruct         | Funcional    | Sin limite practico | $0    |
+| `huggingface_llama` | meta-llama/Llama-3.1-8B-Instruct | No confiable | Sin limite          | $0    |
+| `openrouter`        | llama-3.3-70b-instruct:free      | Correcto     | 200 req/dia         | $0    |
+| `openrouter_claude` | anthropic/claude-sonnet-4.6      | Correcto     | Alto                | Pago  |
 
 ---
 
@@ -57,6 +57,7 @@ en cuentas HF Pro ($9/mes) o en Inference Endpoints dedicados. El tier
 gratuito de Serverless Inference retorna HTTP 404 para esa ruta.
 
 Se probaron dos URLs sin exito:
+
 - `https://api-inference.huggingface.co/v1/chat/completions`
 - `https://api-inference.huggingface.co/models/{model}/v1/chat/completions`
 
@@ -82,6 +83,7 @@ sin credito en la cuenta.
 ### Qwen 2.5 7B via HF nativo — decision final
 
 `Qwen/Qwen2.5-7B-Instruct` con el provider `huggingface/` de LiteLLM:
+
 - Ejecuta herramientas correctamente (las llama via el mecanismo interno de ADK)
 - Sin rate limits practicos en el tier gratuito
 - Los datos retornan desde Supabase (no mock)
@@ -115,7 +117,7 @@ bloque CJK (chino/japones/coreano que el modelo usa para razonamiento interno).
 
 ---
 
-## Retry con backoff (factor_bridge_agent/__init__.py)
+## Retry con backoff (factor_bridge_agent/**init**.py)
 
 Aplica para todos los providers. Parchea `LiteLLMClient.acompletion` de ADK
 para que los reintentos por 429 usen `asyncio.sleep` real con el valor del
@@ -144,6 +146,7 @@ patch garantiza esperas reales entre intentos.
 ### Desarrollo local
 
 Editar `factor_bridge_agent/.env`:
+
 ```
 MODEL_PROVIDER=openrouter   # o huggingface, openrouter_claude
 ```
@@ -151,12 +154,14 @@ MODEL_PROVIDER=openrouter   # o huggingface, openrouter_claude
 ### Produccion (Cloud Run)
 
 Opcion 1 — redeploy via Cloud Build:
+
 ```bash
 # Editar infra/cloudbuild.yaml: --set-env-vars=MODEL_PROVIDER=openrouter
 gcloud builds submit --config=infra/cloudbuild.yaml --project=adk-devops-agent --substitutions=SHORT_SHA=$(git rev-parse --short HEAD) .
 ```
 
 Opcion 2 — actualizar solo la variable de entorno (sin rebuild de imagen):
+
 ```bash
 gcloud run services update factor-bridge-agent \
   --region=us-central1 \

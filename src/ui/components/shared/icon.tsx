@@ -65,11 +65,7 @@ const PATHS: Record<IconName, React.ReactNode> = {
   "solar:graph-up-linear": (
     <>
       <path d="M3 3v15a3 3 0 0 0 3 3h15" strokeLinecap="round" />
-      <path
-        d="m7 14 3.5-3.5 2.5 2.5L20 6"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+      <path d="m7 14 3.5-3.5 2.5 2.5L20 6" strokeLinecap="round" strokeLinejoin="round" />
       <path d="M15 6h5v5" strokeLinecap="round" strokeLinejoin="round" />
     </>
   ),
