@@ -25,7 +25,6 @@ export default async function WalletPage() {
         <div className="mb-8">
           <VaultCard />
         </div>
-
       </div>
     </div>
   );
