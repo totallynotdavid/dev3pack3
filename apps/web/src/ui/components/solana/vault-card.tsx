@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useWallet } from "@/lib/solana/wallet/context";
 import { useBalance } from "@/lib/solana/hooks/use-balance";
+import { useVaultBalance } from "@/lib/solana/hooks/use-vault-balance";
 import { useAirdrop } from "@/lib/solana/hooks/use-airdrop";
 import { useVaultDeposit } from "@/lib/solana/hooks/use-vault-deposit";
 import { useVaultWithdraw } from "@/lib/solana/hooks/use-vault-withdraw";
@@ -14,6 +15,7 @@ export function VaultCard() {
   const { wallet, status } = useWallet();
   const { cluster } = useCluster();
   const balance = useBalance(wallet?.account.address);
+  const vault = useVaultBalance(wallet?.account.address);
   const { requestAirdrop, isAirdropping } = useAirdrop();
   const { deposit, isDepositing } = useVaultDeposit();
   const { withdraw, isWithdrawing } = useVaultWithdraw();
@@ -28,25 +30,29 @@ export function VaultCard() {
             Solana Wallet
           </span>
         </div>
-        <p className="text-sm text-muted-foreground">
-          Connect your Solana wallet to manage crypto assets
-        </p>
+        <p className="text-sm text-muted-foreground">Connect your Solana wallet to manage funds</p>
       </div>
     );
   }
 
+  const vaultLamports = vault.lamports ?? 0n;
+  const vaultIsEmpty = vaultLamports === 0n;
+
   const handleAirdrop = async () => {
-    if (!wallet) return;
-    await requestAirdrop(wallet.account.address, 1_000_000_000n); // 1 SOL
+    await requestAirdrop(wallet.account.address, 1_000_000_000n);
   };
 
   const handleDeposit = async () => {
-    const amount = parseFloat(depositAmount);
-    if (isNaN(amount) || amount <= 0) return;
-
-    const lamports = BigInt(Math.floor(amount * 1_000_000_000));
-    await deposit(lamports);
+    const sol = parseFloat(depositAmount);
+    if (isNaN(sol) || sol <= 0) return;
+    await deposit(BigInt(Math.floor(sol * 1_000_000_000)));
     setDepositAmount("");
+    await Promise.all([balance.mutate(), vault.mutate()]);
+  };
+
+  const handleWithdraw = async () => {
+    await withdraw();
+    await Promise.all([balance.mutate(), vault.mutate()]);
   };
 
   return (
@@ -66,17 +72,26 @@ export function VaultCard() {
         </div>
       </div>
 
-      {/* Balance */}
-      <div className="mb-8">
-        <p className="mb-1 text-xs text-muted-foreground">Wallet Balance</p>
-        <p className="font-display text-5xl tracking-tighter text-foreground">
-          {balance.lamports != null ? lamportsToSolString(balance.lamports, 4) : "—"}
-          <span className="ml-2 text-2xl font-normal text-muted-foreground">SOL</span>
-        </p>
-        <p className="mt-1 text-xs text-muted-foreground">on {cluster}</p>
+      {/* Balances */}
+      <div className="mb-8 grid grid-cols-2 gap-6">
+        <div>
+          <p className="mb-1 text-xs text-muted-foreground">Wallet</p>
+          <p className="font-display text-3xl tracking-tighter text-foreground">
+            {balance.lamports != null ? lamportsToSolString(balance.lamports, 4) : "—"}
+            <span className="ml-1 text-base font-normal text-muted-foreground">SOL</span>
+          </p>
+        </div>
+        <div>
+          <p className="mb-1 text-xs text-muted-foreground">Vault (locked)</p>
+          <p className="font-display text-3xl tracking-tighter text-foreground">
+            {vault.lamports != null ? lamportsToSolString(vault.lamports, 4) : "—"}
+            <span className="ml-1 text-base font-normal text-muted-foreground">SOL</span>
+          </p>
+        </div>
       </div>
+      <p className="mb-8 -mt-4 text-xs text-muted-foreground">on {cluster}</p>
 
-      {/* Airdrop (only on devnet/testnet/localnet) */}
+      {/* Airdrop (devnet / testnet only) */}
       {cluster !== "mainnet" && (
         <div className="mb-6 rounded-lg border border-blue-500/20 bg-blue-500/5 p-4">
           <p className="mb-3 text-xs font-medium text-foreground">Test Network Faucet</p>
@@ -87,61 +102,53 @@ export function VaultCard() {
           >
             {isAirdropping ? "Requesting..." : "Request 1 SOL Airdrop"}
           </button>
-          <p className="mt-2 text-xs text-muted-foreground">Get test SOL for development</p>
         </div>
       )}
 
-      {/* Vault Operations */}
+      {/* Vault operations */}
       <div className="space-y-4 border-t border-border pt-6">
         <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-          Vault Operations
+          Vault
         </p>
 
-        {/* Deposit */}
-        <div>
-          <label className="mb-2 block text-xs text-muted-foreground">Deposit to Vault</label>
-          <div className="flex gap-2">
-            <input
-              type="number"
-              step="0.01"
-              min="0"
-              value={depositAmount}
-              onChange={(e) => setDepositAmount(e.target.value)}
-              placeholder="0.00"
-              className="flex-1 rounded-lg border border-border-strong bg-background px-3 py-2 text-sm focus:border-foreground focus:outline-none"
-            />
+        {vaultIsEmpty ? (
+          <div>
+            <label className="mb-2 block text-xs text-muted-foreground">
+              Lock SOL as offer collateral
+            </label>
+            <div className="flex gap-2">
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                value={depositAmount}
+                onChange={(e) => setDepositAmount(e.target.value)}
+                placeholder="0.00 SOL"
+                className="flex-1 rounded-lg border border-border-strong bg-background px-3 py-2 text-sm focus:border-foreground focus:outline-none"
+              />
+              <button
+                onClick={handleDeposit}
+                disabled={isDepositing || !depositAmount || parseFloat(depositAmount) <= 0}
+                className="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white transition hover:bg-orange-600 disabled:opacity-50"
+              >
+                {isDepositing ? "Locking..." : "Lock"}
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div>
+            <p className="mb-3 text-xs text-muted-foreground">
+              {lamportsToSolString(vaultLamports, 4)} SOL locked. Withdraw to release funds.
+            </p>
             <button
-              onClick={handleDeposit}
-              disabled={isDepositing || !depositAmount || parseFloat(depositAmount) <= 0}
-              className="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white transition hover:bg-orange-600 disabled:opacity-50"
+              onClick={handleWithdraw}
+              disabled={isWithdrawing}
+              className="w-full rounded-lg border border-border-strong bg-card px-4 py-2.5 text-sm font-medium transition hover:bg-cream disabled:opacity-50"
             >
-              {isDepositing ? "Depositing..." : "Deposit"}
+              {isWithdrawing ? "Withdrawing..." : "Withdraw All"}
             </button>
           </div>
-          <p className="mt-1 text-xs text-muted-foreground">Lock SOL in vault for offers</p>
-        </div>
-
-        {/* Withdraw */}
-        <div>
-          <button
-            onClick={withdraw}
-            disabled={isWithdrawing}
-            className="w-full rounded-lg border border-border-strong bg-card px-4 py-2.5 text-sm font-medium transition hover:bg-cream disabled:opacity-50"
-          >
-            {isWithdrawing ? "Withdrawing..." : "Withdraw All from Vault"}
-          </button>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Withdraw all SOL from vault to wallet
-          </p>
-        </div>
-      </div>
-
-      {/* Info */}
-      <div className="mt-6 rounded-lg border border-dashed border-border-strong bg-secondary p-4">
-        <p className="text-xs text-muted-foreground">
-          <strong>Note:</strong> Vault operations require a configured and deployed vault program on{" "}
-          {cluster}.
-        </p>
+        )}
       </div>
     </div>
   );

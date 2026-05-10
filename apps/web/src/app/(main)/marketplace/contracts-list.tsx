@@ -1,7 +1,9 @@
+import { connection } from "next/server";
 import { getActiveContracts } from "@/lib/db/queries/contracts";
 import { ContractCard } from "@/ui/components/marketplace/contract-card";
 
 export async function ContractsList() {
+  await connection();
   const contracts = await getActiveContracts();
 
   if (contracts.length === 0) {

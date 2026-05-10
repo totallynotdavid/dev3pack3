@@ -1,3 +1,4 @@
+import { unstable_cache } from "next/cache";
 import { db } from "@/db/index.ts";
 import { contracts, type ContractStatus, type RiskCategory } from "@/db/schema.ts";
 import { eq, desc } from "drizzle-orm";
@@ -33,12 +34,15 @@ export async function getContractById(contractId: string) {
   });
 }
 
-export async function getActiveContracts() {
-  return db.query.contracts.findMany({
-    where: eq(contracts.status, "active"),
-    orderBy: desc(contracts.createdAt),
-  });
-}
+export const getActiveContracts = unstable_cache(
+  () =>
+    db.query.contracts.findMany({
+      where: eq(contracts.status, "active"),
+      orderBy: desc(contracts.createdAt),
+    }),
+  ["active-contracts"],
+  { revalidate: 60, tags: ["contracts"] },
+);
 
 export async function getSellerContracts(sellerId: string) {
   return db.query.contracts.findMany({

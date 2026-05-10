@@ -38,10 +38,3 @@ export async function updateUserBalance(clerkId: string, newBalance: number) {
 
   return updated[0];
 }
-
-export async function addToUserBalance(clerkId: string, amount: number) {
-  const user = await getUserById(clerkId);
-  if (!user) throw new Error("User not found");
-
-  return updateUserBalance(clerkId, user.walletBalance + amount);
-}

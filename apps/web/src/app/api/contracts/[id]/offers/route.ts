@@ -1,4 +1,5 @@
 import { auth } from "@clerk/nextjs/server";
+import { revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
 import { contracts, offers, users, walletTransactions } from "@/db/schema";
@@ -97,6 +98,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       return offerId;
     });
 
+    revalidateTag("contracts", "max");
     return NextResponse.json({ id: result, success: true });
   } catch (error) {
     console.error("Error creating offer:", error);

@@ -1,4 +1,5 @@
 import { auth } from "@clerk/nextjs/server";
+import { revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
 import { contracts, offers, users, walletTransactions } from "@/db/schema";
@@ -121,6 +122,7 @@ export async function PATCH(
       return NextResponse.json({ error: "Invalid action" }, { status: 400 });
     }
 
+    revalidateTag("contracts", "max");
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error processing offer action:", error);

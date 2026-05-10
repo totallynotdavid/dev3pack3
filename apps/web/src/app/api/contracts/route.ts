@@ -1,4 +1,5 @@
 import { auth } from "@clerk/nextjs/server";
+import { revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
 import { contracts, type ContractStatus } from "@/db/schema";
@@ -56,6 +57,7 @@ export async function POST(request: NextRequest) {
       riskCategory,
     );
 
+    revalidateTag("contracts", "max");
     return NextResponse.json({ id: contract.id, success: true });
   } catch (error) {
     console.error("Error creating contract:", error);

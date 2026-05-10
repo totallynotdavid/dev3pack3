@@ -14,7 +14,5 @@ export function SolanaClientProvider({ children }: { children: ReactNode }) {
 }
 
 export function useSolanaClient() {
-  const client = useContext(SolanaClientContext);
-  if (!client) throw new Error("useSolanaClient must be used within SolanaClientProvider");
-  return client;
+  return useContext(SolanaClientContext);
 }

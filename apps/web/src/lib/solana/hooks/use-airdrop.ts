@@ -13,6 +13,7 @@ export function useAirdrop() {
 
   const requestAirdrop = useCallback(
     async (address: Address, amount: bigint = 1_000_000_000n) => {
+      if (!client) return;
       if (cluster === "mainnet") {
         toast.error("Airdrop not available on mainnet");
         return;

@@ -11,16 +11,16 @@ export function useBalance(address?: Address) {
   const client = useSolanaClient();
 
   const { data, isLoading, error, mutate } = useSWR(
-    address ? (["balance", cluster, address] as const) : null,
+    address && client ? (["balance", cluster, address] as const) : null,
     async ([, , addr]) => {
-      const { value } = await client.rpc.getBalance(addr).send();
+      const { value } = await client!.rpc.getBalance(addr).send();
       return value;
     },
     { refreshInterval: 60_000, revalidateOnFocus: true },
   );
 
   useEffect(() => {
-    if (!address) return;
+    if (!address || !client) return;
 
     const abortController = new AbortController();
 

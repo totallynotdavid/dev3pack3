@@ -3,10 +3,11 @@
 import { useCallback } from "react";
 import { useSendTransaction } from "./use-send-transaction";
 import { useWallet } from "../wallet/context";
+import { getVaultPda, buildDepositInstruction } from "../vault/client";
 import { toast } from "sonner";
 
 export function useVaultDeposit() {
-  const { isSending } = useSendTransaction();
+  const { send, isSending } = useSendTransaction();
   const { wallet } = useWallet();
 
   const deposit = useCallback(
@@ -16,23 +17,27 @@ export function useVaultDeposit() {
         return;
       }
 
-      try {
-        if (amountLamports <= 0n) {
-          throw new Error("Deposit amount must be greater than zero");
-        }
+      const signerAddress = wallet.account.address;
+      const vaultPda = await getVaultPda(signerAddress);
+      const instruction = await buildDepositInstruction(signerAddress, vaultPda, amountLamports);
 
-        if (!process.env.NEXT_PUBLIC_PROGRAM_ID) {
-          throw new Error("Vault program is not configured");
-        }
+      const signature = await send({ instructions: [instruction] });
 
-        throw new Error("Vault deposit is not available in this build");
-      } catch (error) {
-        console.error("Deposit error:", error);
-        toast.error(error instanceof Error ? error.message : "Deposit failed");
-        throw error;
+      const res = await fetch("/api/wallet/deposit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ signature, walletAddress: signerAddress }),
+      });
+
+      if (!res.ok) {
+        const { error } = (await res.json()) as { error: string };
+        throw new Error(error ?? "Failed to record deposit");
       }
+
+      toast.success(`${Number(amountLamports) / 1_000_000_000} SOL deposited to vault`);
+      return signature;
     },
-    [wallet],
+    [wallet, send],
   );
 
   return { deposit, isDepositing: isSending };

@@ -3,10 +3,11 @@
 import { useCallback } from "react";
 import { useSendTransaction } from "./use-send-transaction";
 import { useWallet } from "../wallet/context";
+import { getVaultPda, buildWithdrawInstruction } from "../vault/client";
 import { toast } from "sonner";
 
 export function useVaultWithdraw() {
-  const { isSending } = useSendTransaction();
+  const { send, isSending } = useSendTransaction();
   const { wallet } = useWallet();
 
   const withdraw = useCallback(async () => {
@@ -15,18 +16,26 @@ export function useVaultWithdraw() {
       return;
     }
 
-    try {
-      if (!process.env.NEXT_PUBLIC_PROGRAM_ID) {
-        throw new Error("Vault program is not configured");
-      }
+    const signerAddress = wallet.account.address;
+    const vaultPda = await getVaultPda(signerAddress);
+    const instruction = await buildWithdrawInstruction(signerAddress, vaultPda);
 
-      throw new Error("Vault withdraw is not available in this build");
-    } catch (error) {
-      console.error("Withdraw error:", error);
-      toast.error(error instanceof Error ? error.message : "Withdraw failed");
-      throw error;
+    const signature = await send({ instructions: [instruction] });
+
+    const res = await fetch("/api/wallet/withdraw", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ signature, walletAddress: signerAddress }),
+    });
+
+    if (!res.ok) {
+      const { error } = (await res.json()) as { error: string };
+      throw new Error(error ?? "Failed to record withdrawal");
     }
-  }, [wallet]);
+
+    toast.success("SOL withdrawn from vault");
+    return signature;
+  }, [wallet, send]);
 
   return { withdraw, isWithdrawing: isSending };
 }

@@ -141,8 +141,17 @@ export function WalletProvider({ children }: PropsWithChildren) {
   return <WalletContext.Provider value={value}>{children}</WalletContext.Provider>;
 }
 
+const DEFAULT_WALLET: WalletContextValue = {
+  connectors: [],
+  status: "disconnected",
+  wallet: undefined,
+  signer: undefined,
+  error: undefined,
+  connect: async () => {},
+  disconnect: async () => {},
+  isReady: false,
+};
+
 export function useWallet() {
-  const ctx = useContext(WalletContext);
-  if (!ctx) throw new Error("useWallet must be used within WalletProvider");
-  return ctx;
+  return useContext(WalletContext) ?? DEFAULT_WALLET;
 }

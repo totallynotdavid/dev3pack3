@@ -46,7 +46,3 @@ export async function releaseFunds(userId: string, amount: number, offerId: stri
 export async function settleFunds(userId: string, amount: number, offerId: string) {
   return createTransaction(userId, amount, "settle", offerId);
 }
-
-export async function depositFunds(userId: string, amount: number) {
-  return createTransaction(userId, amount, "deposit");
-}

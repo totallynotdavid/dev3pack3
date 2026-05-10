@@ -1,27 +1,19 @@
+import { fileURLToPath } from "url";
+import { dirname } from "path";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
 /** @type {import('next').NextConfig} */
 const config = {
-  // Cache Components (Partial Prerendering)
-  // Enables mixing static, cached, and dynamic content in a single route.
-  // See: https://nextjs.org/docs/app/getting-started/cache-components
-  cacheComponents: true,
+  turbopack: {
+    root: __dirname,
+  },
 
-  // Optimize barrel file imports for better bundle size and cold start performance
-  // See: https://vercel.com/blog/how-we-optimized-package-imports-in-next-js
   experimental: {
     optimizePackageImports: ["lucide-react", "lodash-es"],
-    // Note: API rate limiting is handled by RequestQueue in src/lib/graphql.ts
-    // (max 3 concurrent requests + 200ms delay between requests)
   },
   images: {
     remotePatterns: [
-      {
-        // Saleor Cloud CDN
-        hostname: "*.saleor.cloud",
-      },
-      {
-        // Saleor Media (common pattern)
-        hostname: "*.media.saleor.cloud",
-      },
       {
         // Allow all hostnames in development (restrict in production)
         hostname: "*",

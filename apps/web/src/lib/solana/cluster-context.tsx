@@ -42,8 +42,12 @@ export function ClusterProvider({ children }: { children: ReactNode }) {
   );
 }
 
+const DEFAULT_CLUSTER: ClusterContextValue = {
+  cluster: "devnet",
+  setCluster: () => {},
+  getExplorerUrl: (path) => getExplorerUrl(path, "devnet"),
+};
+
 export function useCluster() {
-  const ctx = useContext(ClusterContext);
-  if (!ctx) throw new Error("useCluster must be used within ClusterProvider");
-  return ctx;
+  return useContext(ClusterContext) ?? DEFAULT_CLUSTER;
 }
