@@ -10,6 +10,7 @@
  */
 
 import { brandConfig } from "@/config/brand";
+import { config } from "@/config/env";
 
 export const seoConfig = {
   /** Site name used in titles and OG tags */
@@ -51,7 +52,7 @@ export const seoConfig = {
  * Falls back to localhost for development
  */
 export function getBaseUrl(): string {
-  return process.env.NEXT_PUBLIC_STOREFRONT_URL || "http://localhost:3000";
+  return config.storefront.url;
 }
 
 /**
