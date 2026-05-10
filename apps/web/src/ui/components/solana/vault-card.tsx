@@ -139,8 +139,8 @@ export function VaultCard() {
       {/* Info */}
       <div className="mt-6 rounded-lg border border-dashed border-border-strong bg-secondary p-4">
         <p className="text-xs text-muted-foreground">
-          <strong>Note:</strong> Vault operations are currently in development. The deposit/withdraw
-          functions will be available once the Anchor program is deployed to {cluster}.
+          <strong>Note:</strong> Vault operations require a configured and deployed vault program on{" "}
+          {cluster}.
         </p>
       </div>
     </div>

@@ -6,7 +6,7 @@ import { useWallet } from "../wallet/context";
 import { toast } from "sonner";
 
 export function useVaultDeposit() {
-  const { send, isSending } = useSendTransaction();
+  const { isSending } = useSendTransaction();
   const { wallet } = useWallet();
 
   const deposit = useCallback(
@@ -17,32 +17,22 @@ export function useVaultDeposit() {
       }
 
       try {
-        toast.info("Preparing deposit transaction...");
+        if (amountLamports <= 0n) {
+          throw new Error("Deposit amount must be greater than zero");
+        }
 
-        // TODO: Implement actual vault deposit instruction
-        // This requires the Anchor program to be deployed and the IDL to be available
-        // For now, we'll show a placeholder message
+        if (!process.env.NEXT_PUBLIC_PROGRAM_ID) {
+          throw new Error("Vault program is not configured");
+        }
 
-        toast.warning("Vault deposit not yet implemented. Coming soon!");
-
-        // Example of what the implementation would look like:
-        // const vaultPda = deriveVaultPda(wallet.account.address);
-        // const depositIx = await createDepositInstruction(
-        //   wallet.account.address,
-        //   vaultPda,
-        //   amountLamports
-        // );
-        // const signature = await send({ instructions: [depositIx] });
-        // toast.success(`Deposited successfully! Signature: ${signature}`);
-
-        return null;
+        throw new Error("Vault deposit is not available in this build");
       } catch (error) {
         console.error("Deposit error:", error);
         toast.error(error instanceof Error ? error.message : "Deposit failed");
         throw error;
       }
     },
-    [wallet, send],
+    [wallet],
   );
 
   return { deposit, isDepositing: isSending };

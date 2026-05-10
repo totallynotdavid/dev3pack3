@@ -6,7 +6,7 @@ import { useWallet } from "../wallet/context";
 import { toast } from "sonner";
 
 export function useVaultWithdraw() {
-  const { send, isSending } = useSendTransaction();
+  const { isSending } = useSendTransaction();
   const { wallet } = useWallet();
 
   const withdraw = useCallback(async () => {
@@ -16,29 +16,17 @@ export function useVaultWithdraw() {
     }
 
     try {
-      toast.info("Preparing withdraw transaction...");
+      if (!process.env.NEXT_PUBLIC_PROGRAM_ID) {
+        throw new Error("Vault program is not configured");
+      }
 
-      // TODO: Implement actual vault withdraw instruction
-      // This requires the Anchor program to be deployed and the IDL to be available
-
-      toast.warning("Vault withdraw not yet implemented. Coming soon!");
-
-      // Example of what the implementation would look like:
-      // const vaultPda = deriveVaultPda(wallet.account.address);
-      // const withdrawIx = await createWithdrawInstruction(
-      //   wallet.account.address,
-      //   vaultPda
-      // );
-      // const signature = await send({ instructions: [withdrawIx] });
-      // toast.success(`Withdrawn successfully! Signature: ${signature}`);
-
-      return null;
+      throw new Error("Vault withdraw is not available in this build");
     } catch (error) {
       console.error("Withdraw error:", error);
       toast.error(error instanceof Error ? error.message : "Withdraw failed");
       throw error;
     }
-  }, [wallet, send]);
+  }, [wallet]);
 
   return { withdraw, isWithdrawing: isSending };
 }
