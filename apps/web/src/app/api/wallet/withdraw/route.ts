@@ -4,8 +4,9 @@ import { db } from "@/db";
 import { users, walletTransactions, offers } from "@/db/schema";
 import { eq, sql, and, inArray } from "drizzle-orm";
 import { createSolanaClient } from "@/lib/solana/solana-client";
-import { getVaultPda } from "@/lib/solana/vault/client";
 import { parseWalletSyncRequestBody } from "@/lib/solana/wallet-sync-boundary";
+import { extractVaultBalance } from "@/lib/solana/vault-balance";
+import { handleWalletError, ValidationError, TransactionError, RpcError, DatabaseError } from "@/lib/wallet/errors";
 import { solanaConfig } from "@/config/env-solana";
 
 export async function POST(request: NextRequest) {
@@ -15,72 +16,60 @@ export async function POST(request: NextRequest) {
 
     const { signature, walletAddress } = parseWalletSyncRequestBody(await request.json());
 
-    // Block withdraw if user has pending or countered offers (SOL is committed as collateral)
     const activeOffers = await db.query.offers.findMany({
       where: and(eq(offers.buyerId, userId), inArray(offers.status, ["pending", "countered"])),
     });
 
     if (activeOffers.length > 0) {
-      return NextResponse.json(
-        { error: "Cannot withdraw while you have active offers. Wait for them to be resolved." },
-        { status: 400 },
+      throw new ValidationError(
+        "Cannot withdraw while you have active offers. Wait for them to be resolved."
       );
     }
 
-    // Verify the transaction on-chain and extract the actual withdrawn amount
     const client = createSolanaClient(solanaConfig.cluster);
 
-    const tx = await client.rpc
-      .getTransaction(signature, {
-        commitment: "confirmed",
-        encoding: "json" as const,
-        maxSupportedTransactionVersion: 0,
-      })
-      .send();
+    let tx;
+    try {
+      tx = await client.rpc
+        .getTransaction(signature, {
+          commitment: "confirmed",
+          encoding: "json" as const,
+          maxSupportedTransactionVersion: 0,
+        })
+        .send();
+    } catch (e) {
+      throw new RpcError("Failed to fetch transaction from blockchain", e);
+    }
 
     if (!tx) {
-      return NextResponse.json(
-        { error: "Transaction not found or not confirmed" },
-        { status: 400 },
-      );
+      throw new TransactionError("Transaction not found or not confirmed", signature);
     }
 
-    const vaultPda = await getVaultPda(walletAddress);
-    const accountKeys = tx.transaction.message.accountKeys;
-    const vaultIndex = accountKeys.findIndex((accountKey) => accountKey === vaultPda);
+    const vault = await extractVaultBalance(tx, walletAddress);
 
-    if (vaultIndex === -1) {
-      return NextResponse.json({ error: "Vault PDA not found in transaction" }, { status: 400 });
+    if (vault.delta >= 0) {
+      throw new ValidationError("No withdrawal detected in transaction");
     }
 
-    const preBalance = Number(tx.meta?.preBalances?.[vaultIndex] ?? 0);
-    const postBalance = Number(tx.meta?.postBalances?.[vaultIndex] ?? 0);
-    const withdrawnLamports = preBalance - postBalance;
+    try {
+      await db.transaction(async (trx) => {
+        await trx
+          .update(users)
+          .set({ walletBalance: sql`GREATEST(wallet_balance - ${Math.abs(vault.delta)}, 0)` })
+          .where(eq(users.id, userId));
 
-    if (withdrawnLamports <= 0) {
-      return NextResponse.json({ error: "No withdrawal detected in transaction" }, { status: 400 });
-    }
-
-    // Debit wallet balance and record transaction
-    await db.transaction(async (trx) => {
-      await trx
-        .update(users)
-        .set({ walletBalance: sql`GREATEST(wallet_balance - ${withdrawnLamports}, 0)` })
-        .where(eq(users.id, userId));
-
-      await trx.insert(walletTransactions).values({
-        userId,
-        amount: -withdrawnLamports,
-        type: "withdraw",
+        await trx.insert(walletTransactions).values({
+          userId,
+          amount: vault.delta,
+          type: "withdraw",
+        });
       });
-    });
-
-    return NextResponse.json({ success: true, amount: withdrawnLamports });
-  } catch (error) {
-    if (error instanceof Error && error.message.startsWith("Invalid wallet sync payload:")) {
-      return NextResponse.json({ error: error.message }, { status: 400 });
+    } catch (e) {
+      throw new DatabaseError("Failed to record withdrawal", e);
     }
-    console.error("Withdrawal sync error:", error);
-    return NextResponse.json({ error: "Failed to record withdrawal" }, { status: 500 });
+
+    return NextResponse.json({ success: true, amount: Math.abs(vault.delta) });
+  } catch (error) {
+    return handleWalletError(error);
   }
 }
