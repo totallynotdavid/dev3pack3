@@ -64,3 +64,6 @@ jobs:
         run: bun run build
         env:
           NEXT_PUBLIC_STOREFRONT_URL: ${{ secrets.NEXT_PUBLIC_STOREFRONT_URL }}
+          POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
+          NEXT_PUBLIC_AGENT_API_URL: ${{ secrets.NEXT_PUBLIC_AGENT_API_URL }}
+          NEXT_PUBLIC_SOLANA_CLUSTER: ${{ secrets.NEXT_PUBLIC_SOLANA_CLUSTER }}
