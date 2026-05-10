@@ -1,4 +1,4 @@
-import { pgTable, text, bigint, uuid, date, timestamp, varchar, index } from "drizzle-orm/pg-core";
+import { pgTable, text, bigint, uuid, date, timestamp, varchar, index, integer, boolean, jsonb } from "drizzle-orm/pg-core";
 import { relations, type InferSelectModel } from "drizzle-orm";
 
 export type ContractStatus = "active" | "under_negotiation" | "sold" | "expired" | "cancelled";
@@ -120,8 +120,81 @@ export const walletTransactionsRelations = relations(walletTransactions, ({ one 
   }),
 }));
 
+// ============================================================================
+// TABLAS DEL AGENTE FACTORBRIDGE
+// ============================================================================
+
+// Documentos validados (DNI/RUC)
+export const documentos = pgTable("documentos", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  tipoDocumento: varchar("tipo_documento", { length: 10 }).notNull(), // "dni" o "ruc"
+  numero: varchar("numero", { length: 20 }).notNull().unique(),
+  nombre: text("nombre"),
+  estado: varchar("estado", { length: 50 }),
+  condicion: varchar("condicion", { length: 50 }),
+  ultimaActualizacion: timestamp("ultima_actualizacion", { withTimezone: true }).defaultNow(),
+  fuenteValidacion: varchar("fuente_validacion", { length: 50 }), // "apis_net_pe", "supabase_cache", etc.
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+// Scores crediticios
+export const creditScores = pgTable("credit_scores", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  documento: varchar("documento", { length: 20 }).notNull().unique(),
+  score: integer("score").notNull(), // 0-850
+  bandaRiesgo: varchar("banda_riesgo", { length: 20 }).notNull(), // "VERDE", "AMARILLO", "ROJO"
+  morosidadActiva: boolean("morosidad_activa").notNull().default(false),
+  listaNegraSBS: boolean("lista_negra_sbs").notNull().default(false),
+  sunatNoHabido: boolean("sunat_no_habido").notNull().default(false),
+  detalleRiesgos: jsonb("detalle_riesgos"), // Objeto JSON con detalles
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+// Cedentes (empresas que venden facturas)
+export const cedentes = pgTable("cedentes", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  ruc: varchar("ruc", { length: 11 }).notNull().unique(),
+  razonSocial: text("razon_social").notNull(),
+  sector: varchar("sector", { length: 100 }),
+  facturasPendientes: integer("facturas_pendientes").default(0),
+  montoPromedio: bigint("monto_promedio", { mode: "number" }),
+  scorePromedio: integer("score_promedio"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+// Factores (inversionistas que compran facturas)
+export const factores = pgTable("factores", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  ruc: varchar("ruc", { length: 11 }).notNull().unique(),
+  razonSocial: text("razon_social").notNull(),
+  apetitoRiesgo: varchar("apetito_riesgo", { length: 20 }).notNull(), // "conservador", "moderado", "agresivo"
+  sectoresPreferidos: jsonb("sectores_preferidos"), // Array de sectores
+  montoMinimoInversion: bigint("monto_minimo_inversion", { mode: "number" }),
+  montoMaximoInversion: bigint("monto_maximo_inversion", { mode: "number" }),
+  plazosPreferidos: jsonb("plazos_preferidos"), // Array de rangos de días
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+// Intenciones de operación (matching)
+export const intenciones = pgTable("intenciones", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  actorRole: varchar("actor_role", { length: 20 }).notNull(), // "cedente" o "factor"
+  actorDocument: varchar("actor_document", { length: 20 }).notNull(),
+  payload: jsonb("payload").notNull(), // Datos de la factura o preferencias
+  estado: varchar("estado", { length: 20 }).notNull().default("pendiente"), // "pendiente", "procesada", "cancelada"
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
 // Row types
 export type User = InferSelectModel<typeof users>;
 export type Contract = InferSelectModel<typeof contracts>;
 export type Offer = InferSelectModel<typeof offers>;
 export type WalletTransaction = InferSelectModel<typeof walletTransactions>;
+export type Documento = InferSelectModel<typeof documentos>;
+export type CreditScore = InferSelectModel<typeof creditScores>;
+export type Cedente = InferSelectModel<typeof cedentes>;
+export type Factor = InferSelectModel<typeof factores>;
+export type Intencion = InferSelectModel<typeof intenciones>;

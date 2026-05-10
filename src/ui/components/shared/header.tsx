@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { SignInButton, UserButton, useAuth } from "@clerk/nextjs";
 import Link from "next/link";
 import { Logo } from "./logo";
+import { ClusterSelect } from "../solana/cluster-select";
+import { WalletButton } from "../solana/wallet-button";
 
 const publicItems = [{ label: "Marketplace", href: "/marketplace" }];
 
@@ -64,6 +66,8 @@ export function Header() {
         </div>
 
         <div className="flex items-center gap-3">
+          <ClusterSelect />
+          <WalletButton />
           {isLoaded && isSignedIn ? (
             <UserButton
               appearance={{

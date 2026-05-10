@@ -5,6 +5,7 @@ import { eq, desc } from "drizzle-orm";
 import { WalletBalance } from "@/ui/components/marketplace/wallet-balance";
 import { formatMoney } from "@/lib/utils";
 import { PageHeader } from "@/ui/components/shared/page-header";
+import { VaultCard } from "@/ui/components/solana/vault-card";
 
 export default async function WalletPage() {
   const { userId } = await auth();
@@ -30,8 +31,13 @@ export default async function WalletPage() {
               Your <span className="italic text-brand">wallet</span>.
             </>
           }
-          description="Top up via Stripe. Funds settle into escrow when offers are accepted."
+          description="Manage fiat (Stripe) and crypto (Solana) balances. Funds settle into escrow when offers are accepted."
         />
+
+        {/* Solana Wallet */}
+        <div className="mb-8">
+          <VaultCard />
+        </div>
 
         <div className="grid gap-8 lg:grid-cols-5">
           {/* Balance + deposit */}

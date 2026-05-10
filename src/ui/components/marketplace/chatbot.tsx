@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useRef, type KeyboardEvent, type FormEvent, type ChangeEvent } from "react";
+import { useState, useRef, useEffect, type KeyboardEvent, type FormEvent, type ChangeEvent } from "react";
 import { cn } from "@/lib/utils";
+import { useUser } from "@clerk/nextjs";
 
 interface Message {
   id: string;
@@ -14,39 +15,67 @@ const INITIAL: Message[] = [
     id: "init",
     role: "assistant",
     content:
-      "Hi, I'm Sentinel AI. I can help you analyze contracts, assess risk profiles, and find the best investment opportunities. What would you like to know?",
+      "Hola, soy FactorBridge AI. Puedo ayudarte a validar RUCs, evaluar riesgos crediticios, analizar facturas y conectarte con factores. ¿En qué puedo ayudarte?",
   },
 ];
 
 const QUICK_QUESTIONS = [
-  "Lowest risk contracts?",
-  "Average yield today?",
-  "How does escrow work?",
+  "¿Qué contratos de bajo riesgo hay?",
+  "Evalúa el RUC 20512345678",
+  "¿Cómo funciona el factoraje?",
 ];
 
-function mockResponse(msg: string): string {
-  const q = msg.toLowerCase();
-  if (q.includes("risk") || q.includes("safe") || q.includes("low"))
-    return "Category A contracts (federal ministries with zero default history) are your safest choice. They yield ~6.1% annualized — modest, but escrow-protected and typically settled within 30 days.";
-  if (q.includes("yield") || q.includes("return") || q.includes("average"))
-    return "Current weighted average yield across active contracts: 8.2% annualized. Category A averages 6.1%, B sits at 9.4%, C reaches 14.3%. Higher yield always carries higher settlement risk.";
-  if (q.includes("escrow") || q.includes("work") || q.includes("how"))
-    return "Sentinel holds all funds in escrow until the government entity confirms payment. Once you open an offer, capital is locked until the debtor settles. This eliminates counterparty risk on both sides.";
-  if (q.includes("best") || q.includes("recommend"))
-    return "For balanced exposure: 60% in Category A federal contracts, 30% in Category B provincial contracts, 10% in Category C. Blended yield ~8.5% with manageable risk.";
-  if (q.includes("government") || q.includes("debtor"))
-    return "All debtors in Sentinel are verified government entities — ministries, provinces, or municipalities with active payment obligations. We verify each contract against official records before listing.";
-  return "Based on current marketplace data, I recommend focusing on government receivables with maturities under 60 days and A or B risk ratings. They offer the best risk-adjusted returns in the current cycle.";
+async function queryAgent(message: string, sessionId: string): Promise<string> {
+  try {
+    // Use Next.js API route as proxy to avoid CORS issues
+    console.log("Querying agent via proxy...");
+    const response = await fetch("/api/agent", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-cache"
+      },
+      body: JSON.stringify({
+        message: message,
+        session_id: sessionId,
+        user_id: "marketplace-user"
+      }),
+    });
+
+    console.log("Agent response status:", response.status);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Agent error response:", errorText);
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log("Agent response data:", data);
+    return data.response || "Lo siento, no pude procesar tu consulta.";
+  } catch (error) {
+    console.error("Error querying agent:", error);
+    return "Lo siento, hubo un error al conectar con el agente. Por favor intenta nuevamente.";
+  }
 }
 
 export function Chatbot() {
+  const { user } = useUser();
   const [messages, setMessages] = useState<Message[]>(INITIAL);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [sessionId, setSessionId] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  useEffect(() => {
+    // Generate a unique session ID for this user's chatbot session
+    const newSessionId = user?.id
+      ? `user-${user.id}-${Date.now()}`
+      : `anon-${Date.now()}`;
+    setSessionId(newSessionId);
+  }, [user?.id]);
 
-  function send(text: string) {
+  async function send(text: string) {
     if (!text.trim() || loading) return;
 
     const userMsg: Message = {
@@ -61,15 +90,24 @@ export function Chatbot() {
 
     if (textareaRef.current) textareaRef.current.style.height = "auto";
 
-    setTimeout(() => {
+    try {
+      const response = await queryAgent(text.trim(), sessionId);
       const aiMsg: Message = {
         id: `a-${Date.now()}`,
         role: "assistant",
-        content: mockResponse(text),
+        content: response,
       };
       setMessages((prev) => [...prev, aiMsg]);
+    } catch (error) {
+      const errorMsg: Message = {
+        id: `a-${Date.now()}`,
+        role: "assistant",
+        content: "Lo siento, hubo un error. Por favor intenta nuevamente.",
+      };
+      setMessages((prev) => [...prev, errorMsg]);
+    } finally {
       setLoading(false);
-    }, 750 + Math.random() * 400);
+    }
   }
 
   function handleSubmit(e: FormEvent) {
