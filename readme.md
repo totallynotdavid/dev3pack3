@@ -3,6 +3,7 @@
 Marketplace and agent stack for contract factoring.
 
 Sentinel is a multi-app monorepo:
+
 - `apps/web`: marketplace and operator UI (Next.js, TypeScript, Tailwind)
 - `apps/agent`: FactorBridge AI service (Google ADK, LiteLLM, Supabase/PostgreSQL)
 - `apps/chain`: Solana/Anchor vault program workspace
