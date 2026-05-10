@@ -5,8 +5,9 @@ import { users, walletTransactions } from "@/db/schema";
 import { eq, sql } from "drizzle-orm";
 import { getOrCreateUser } from "@/lib/db/queries/users";
 import { createSolanaClient } from "@/lib/solana/solana-client";
-import { getVaultPda } from "@/lib/solana/vault/client";
 import { parseWalletSyncRequestBody } from "@/lib/solana/wallet-sync-boundary";
+import { extractVaultBalance } from "@/lib/solana/vault-balance";
+import { handleWalletError, ValidationError, TransactionError, RpcError, DatabaseError } from "@/lib/wallet/errors";
 import { solanaConfig } from "@/config/env-solana";
 
 export async function POST(request: NextRequest) {
@@ -16,63 +17,52 @@ export async function POST(request: NextRequest) {
 
     const { signature, walletAddress } = parseWalletSyncRequestBody(await request.json());
 
-    // Verify the transaction on-chain and extract the actual deposited amount
     const client = createSolanaClient(solanaConfig.cluster);
 
-    const tx = await client.rpc
-      .getTransaction(signature, {
-        commitment: "confirmed",
-        encoding: "json" as const,
-        maxSupportedTransactionVersion: 0,
-      })
-      .send();
+    let tx;
+    try {
+      tx = await client.rpc
+        .getTransaction(signature, {
+          commitment: "confirmed",
+          encoding: "json" as const,
+          maxSupportedTransactionVersion: 0,
+        })
+        .send();
+    } catch (e) {
+      throw new RpcError("Failed to fetch transaction from blockchain", e);
+    }
 
     if (!tx) {
-      return NextResponse.json(
-        { error: "Transaction not found or not confirmed" },
-        { status: 400 },
-      );
+      throw new TransactionError("Transaction not found or not confirmed", signature);
     }
 
-    // Find the vault PDA in the transaction accounts and read its balance delta
-    const vaultPda = await getVaultPda(walletAddress);
-    const accountKeys = tx.transaction.message.accountKeys;
-    const vaultIndex = accountKeys.findIndex((accountKey) => accountKey === vaultPda);
+    const vault = await extractVaultBalance(tx, walletAddress);
 
-    if (vaultIndex === -1) {
-      return NextResponse.json({ error: "Vault PDA not found in transaction" }, { status: 400 });
-    }
-
-    const preBalance = Number(tx.meta?.preBalances?.[vaultIndex] ?? 0);
-    const postBalance = Number(tx.meta?.postBalances?.[vaultIndex] ?? 0);
-    const depositedLamports = postBalance - preBalance;
-
-    if (depositedLamports <= 0) {
-      return NextResponse.json({ error: "No deposit detected in transaction" }, { status: 400 });
+    if (vault.delta <= 0) {
+      throw new ValidationError("No deposit detected in transaction");
     }
 
     await getOrCreateUser(userId, "", "");
 
-    // Atomically credit wallet balance and record the transaction
-    await db.transaction(async (trx) => {
-      await trx
-        .update(users)
-        .set({ walletBalance: sql`wallet_balance + ${depositedLamports}` })
-        .where(eq(users.id, userId));
+    try {
+      await db.transaction(async (trx) => {
+        await trx
+          .update(users)
+          .set({ walletBalance: sql`wallet_balance + ${vault.delta}` })
+          .where(eq(users.id, userId));
 
-      await trx.insert(walletTransactions).values({
-        userId,
-        amount: depositedLamports,
-        type: "deposit",
+        await trx.insert(walletTransactions).values({
+          userId,
+          amount: vault.delta,
+          type: "deposit",
+        });
       });
-    });
-
-    return NextResponse.json({ success: true, amount: depositedLamports });
-  } catch (error) {
-    if (error instanceof Error && error.message.startsWith("Invalid wallet sync payload:")) {
-      return NextResponse.json({ error: error.message }, { status: 400 });
+    } catch (e) {
+      throw new DatabaseError("Failed to record deposit", e);
     }
-    console.error("Deposit sync error:", error);
-    return NextResponse.json({ error: "Failed to record deposit" }, { status: 500 });
+
+    return NextResponse.json({ success: true, amount: vault.delta });
+  } catch (error) {
+    return handleWalletError(error);
   }
 }
