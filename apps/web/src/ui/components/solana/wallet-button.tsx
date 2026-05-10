@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import Image from "next/image";
 import { useWallet } from "@/lib/solana/wallet/context";
 import { useBalance } from "@/lib/solana/hooks/use-balance";
 import { useAirdrop } from "@/lib/solana/hooks/use-airdrop";
@@ -25,7 +26,7 @@ export function WalletButton() {
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
+      if (ref.current && e.target instanceof Node && !ref.current.contains(e.target)) {
         close();
       }
     }
@@ -43,6 +44,14 @@ export function WalletButton() {
   const handleAirdrop = async () => {
     if (!address) return;
     await requestAirdrop(address, 1_000_000_000n); // 1 SOL
+  };
+
+  const handleDisconnect = async () => {
+    try {
+      await disconnect();
+    } finally {
+      close();
+    }
   };
 
   if (status !== "connected") {
@@ -74,18 +83,20 @@ export function WalletButton() {
                   className="flex w-full cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium transition hover:bg-cream disabled:opacity-50 disabled:pointer-events-none"
                 >
                   {connector.icon && (
-                    <img src={connector.icon} alt="" className="h-5 w-5 rounded" />
+                    <Image
+                      src={connector.icon}
+                      alt=""
+                      width={20}
+                      height={20}
+                      className="h-5 w-5 rounded"
+                    />
                   )}
                   <span>{connector.name}</span>
                 </button>
               ))}
             </div>
             {status === "connecting" && <p className="mt-2 text-xs text-muted">Connecting...</p>}
-            {error != null && (
-              <p className="mt-2 text-xs text-destructive">
-                {error instanceof Error ? error.message : String(error)}
-              </p>
-            )}
+            {error != null && <p className="mt-2 text-xs text-destructive">{error.message}</p>}
           </div>
         )}
       </div>
@@ -145,8 +156,7 @@ export function WalletButton() {
 
           <button
             onClick={() => {
-              disconnect();
-              close();
+              void handleDisconnect();
             }}
             className="mt-2 w-full cursor-pointer rounded-lg border border-border-low bg-card px-3 py-2 text-xs font-medium text-destructive transition hover:bg-destructive/10"
           >
