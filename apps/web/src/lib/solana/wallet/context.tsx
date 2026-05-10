@@ -30,7 +30,7 @@ type WalletContextValue = {
   status: WalletStatus;
   wallet: WalletSession | undefined;
   signer: TransactionSigner | undefined;
-  error: unknown;
+  error: Error | undefined;
   connect: (connectorId: string) => Promise<void>;
   disconnect: () => Promise<void>;
   isReady: boolean;
@@ -39,6 +39,12 @@ type WalletContextValue = {
 const WalletContext = createContext<WalletContextValue | null>(null);
 
 const STORAGE_KEY = "solana:last-connector";
+
+function toError(value: unknown): Error {
+  if (value instanceof Error) return value;
+  if (typeof value === "string") return new Error(value);
+  return new Error("Unexpected wallet error");
+}
 
 export function WalletProvider({ children }: PropsWithChildren) {
   const { cluster } = useCluster();
@@ -49,7 +55,7 @@ export function WalletProvider({ children }: PropsWithChildren) {
   );
   const [session, setSession] = useState<WalletSession | undefined>();
   const [status, setStatus] = useState<WalletStatus>(WALLET_STATUS.DISCONNECTED);
-  const [error, setError] = useState<unknown>();
+  const [error, setError] = useState<Error | undefined>();
   const isReady = typeof window !== "undefined";
 
   const connectorsRef = useRef<WalletConnector[]>(connectors);
@@ -100,7 +106,7 @@ export function WalletProvider({ children }: PropsWithChildren) {
       setStatus(WALLET_STATUS.CONNECTED);
       localStorage.setItem(STORAGE_KEY, connectorId);
     } catch (err) {
-      setError(err);
+      setError(toError(err));
       setStatus(WALLET_STATUS.ERROR);
     }
   }, []);
