@@ -1,4 +1,4 @@
-import { Address } from "@solana/kit";
+import { Address, Lamports } from "@solana/kit";
 import { TransactionError } from "@/lib/wallet/errors";
 import { getVaultPda } from "./vault/client";
 
@@ -11,19 +11,23 @@ export interface VaultBalance {
 type GetTransactionResponse = {
   transaction: {
     message: {
-      accountKeys: Address[];
+      accountKeys: readonly Address[];
     };
   };
   meta: {
-    preBalances: number[];
-    postBalances: number[];
-  };
+    preBalances: readonly Lamports[];
+    postBalances: readonly Lamports[];
+  } | null;
 };
 
 export async function extractVaultBalance(
   tx: GetTransactionResponse,
-  walletAddress: string,
+  walletAddress: Address,
 ): Promise<VaultBalance> {
+  if (!tx.meta) {
+    throw new TransactionError("Transaction metadata not available");
+  }
+
   const vaultPda = await getVaultPda(walletAddress);
   const accountKeys = tx.transaction.message.accountKeys;
   const vaultIndex = accountKeys.findIndex((key) => key === vaultPda);
@@ -32,8 +36,8 @@ export async function extractVaultBalance(
     throw new TransactionError("Vault PDA not found in transaction");
   }
 
-  const preBalance = tx.meta.preBalances[vaultIndex];
-  const postBalance = tx.meta.postBalances[vaultIndex];
+  const preBalance = Number(tx.meta.preBalances[vaultIndex]);
+  const postBalance = Number(tx.meta.postBalances[vaultIndex]);
 
   return {
     preBalance,
