@@ -1,14 +1,5 @@
-import { fileURLToPath } from "url";
-import { dirname } from "path";
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
-
 /** @type {import('next').NextConfig} */
 const config = {
-  turbopack: {
-    root: __dirname,
-  },
-
   experimental: {
     optimizePackageImports: ["lucide-react", "lodash-es"],
   },
@@ -43,16 +34,6 @@ const config = {
             },
           ]
         : []),
-      {
-        // Static assets - cache for 1 year (immutable with hash in filename)
-        source: "/_next/static/:path*",
-        headers: [
-          {
-            key: "Cache-Control",
-            value: "public, max-age=31536000, immutable",
-          },
-        ],
-      },
       {
         // Public folder assets - cache for 1 month (logos, favicons, etc.)
         source: "/(.*)\\.(ico|png|jpg|jpeg|gif|svg|webp|woff|woff2|webmanifest)",
