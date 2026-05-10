@@ -7,7 +7,13 @@ import { getOrCreateUser } from "@/lib/db/queries/users";
 import { createSolanaClient } from "@/lib/solana/solana-client";
 import { parseWalletSyncRequestBody } from "@/lib/solana/wallet-sync-boundary";
 import { extractVaultBalance } from "@/lib/solana/vault-balance";
-import { handleWalletError, ValidationError, TransactionError, RpcError, DatabaseError } from "@/lib/wallet/errors";
+import {
+  handleWalletError,
+  ValidationError,
+  TransactionError,
+  RpcError,
+  DatabaseError,
+} from "@/lib/wallet/errors";
 import { solanaConfig } from "@/config/env-solana";
 
 export async function POST(request: NextRequest) {

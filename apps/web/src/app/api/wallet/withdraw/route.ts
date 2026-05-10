@@ -6,7 +6,13 @@ import { eq, sql, and, inArray } from "drizzle-orm";
 import { createSolanaClient } from "@/lib/solana/solana-client";
 import { parseWalletSyncRequestBody } from "@/lib/solana/wallet-sync-boundary";
 import { extractVaultBalance } from "@/lib/solana/vault-balance";
-import { handleWalletError, ValidationError, TransactionError, RpcError, DatabaseError } from "@/lib/wallet/errors";
+import {
+  handleWalletError,
+  ValidationError,
+  TransactionError,
+  RpcError,
+  DatabaseError,
+} from "@/lib/wallet/errors";
 import { solanaConfig } from "@/config/env-solana";
 
 export async function POST(request: NextRequest) {
@@ -22,7 +28,7 @@ export async function POST(request: NextRequest) {
 
     if (activeOffers.length > 0) {
       throw new ValidationError(
-        "Cannot withdraw while you have active offers. Wait for them to be resolved."
+        "Cannot withdraw while you have active offers. Wait for them to be resolved.",
       );
     }
 
