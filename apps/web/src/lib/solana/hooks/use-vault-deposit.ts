@@ -4,6 +4,7 @@ import { useCallback } from "react";
 import { useSendTransaction } from "./use-send-transaction";
 import { useWallet } from "../wallet/context";
 import { getVaultPda, buildDepositInstruction } from "../vault/client";
+import { parseApiErrorMessage } from "../wallet-sync-boundary";
 import { toast } from "sonner";
 
 export function useVaultDeposit() {
@@ -11,7 +12,7 @@ export function useVaultDeposit() {
   const { wallet } = useWallet();
 
   const deposit = useCallback(
-    async (amountLamports: bigint) => {
+    async (amountLamports: bigint): Promise<void> => {
       if (!wallet) {
         toast.error("Wallet not connected");
         return;
@@ -30,12 +31,11 @@ export function useVaultDeposit() {
       });
 
       if (!res.ok) {
-        const { error } = (await res.json()) as { error: string };
-        throw new Error(error ?? "Failed to record deposit");
+        const errorBody = await res.json();
+        throw new Error(parseApiErrorMessage(errorBody, "Failed to record deposit"));
       }
 
       toast.success(`${Number(amountLamports) / 1_000_000_000} SOL deposited to vault`);
-      return signature;
     },
     [wallet, send],
   );

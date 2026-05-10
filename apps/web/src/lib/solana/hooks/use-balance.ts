@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import useSWR from "swr";
-import { type Address, type Lamports } from "@solana/kit";
+import { type Address } from "@solana/kit";
 import { useCluster } from "../cluster-context";
 import { useSolanaClient } from "../solana-client-context";
 
@@ -20,7 +20,8 @@ export function useBalance(address?: Address) {
   );
 
   useEffect(() => {
-    if (!address || !client) return;
+    const noopCleanup = () => {};
+    if (!address || !client) return noopCleanup;
 
     const abortController = new AbortController();
 
@@ -32,7 +33,7 @@ export function useBalance(address?: Address) {
 
         for await (const notification of notifications) {
           const lamports = notification.value.lamports;
-          mutate(lamports, { revalidate: false });
+          void mutate(lamports, { revalidate: false });
         }
       } catch {
         // SWR polling and focus revalidation remain as fallback
@@ -41,13 +42,14 @@ export function useBalance(address?: Address) {
 
     void subscribe();
 
-    return () => {
+    const cleanup = () => {
       abortController.abort();
     };
+    return cleanup;
   }, [address, client, mutate]);
 
   return {
-    lamports: (data ?? null) as Lamports | null,
+    lamports: data ?? null,
     isLoading,
     error,
     mutate,

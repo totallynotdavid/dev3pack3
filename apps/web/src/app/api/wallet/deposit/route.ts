@@ -6,30 +6,24 @@ import { eq, sql } from "drizzle-orm";
 import { getOrCreateUser } from "@/lib/db/queries/users";
 import { createSolanaClient } from "@/lib/solana/solana-client";
 import { getVaultPda } from "@/lib/solana/vault/client";
-import { type Address } from "@solana/kit";
+import {
+  parseWalletSyncRequestBody,
+  resolveSolanaCluster,
+} from "@/lib/solana/wallet-sync-boundary";
 
 export async function POST(request: NextRequest) {
   try {
     const { userId } = await auth();
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const { signature, walletAddress } = (await request.json()) as {
-      signature: string;
-      walletAddress: string;
-    };
-
-    if (!signature || !walletAddress) {
-      return NextResponse.json({ error: "Missing signature or walletAddress" }, { status: 400 });
-    }
+    const { signature, walletAddress } = parseWalletSyncRequestBody(await request.json());
 
     // Verify the transaction on-chain and extract the actual deposited amount
-    const cluster = (process.env.NEXT_PUBLIC_SOLANA_CLUSTER ?? "devnet") as Parameters<
-      typeof createSolanaClient
-    >[0];
+    const cluster = resolveSolanaCluster(process.env.NEXT_PUBLIC_SOLANA_CLUSTER);
     const client = createSolanaClient(cluster);
 
     const tx = await client.rpc
-      .getTransaction(signature as Parameters<typeof client.rpc.getTransaction>[0], {
+      .getTransaction(signature, {
         commitment: "confirmed",
         encoding: "json" as const,
         maxSupportedTransactionVersion: 0,
@@ -44,11 +38,21 @@ export async function POST(request: NextRequest) {
     }
 
     // Find the vault PDA in the transaction accounts and read its balance delta
-    const vaultPda = await getVaultPda(walletAddress as Address);
+    const vaultPda = await getVaultPda(walletAddress);
     const accountKeys = tx.transaction.message.accountKeys;
-    const vaultIndex = accountKeys.findIndex(
-      (k) => k === (vaultPda as unknown as (typeof accountKeys)[number]),
-    );
+    const vaultIndex = accountKeys.findIndex((accountKey) => {
+      if (typeof accountKey === "string") {
+        return accountKey === vaultPda;
+      }
+      if (typeof accountKey !== "object" || accountKey === null) {
+        return false;
+      }
+      if (!("address" in accountKey)) {
+        return false;
+      }
+      const keyAddress = accountKey.address;
+      return typeof keyAddress === "string" && keyAddress === vaultPda;
+    });
 
     if (vaultIndex === -1) {
       return NextResponse.json({ error: "Vault PDA not found in transaction" }, { status: 400 });
@@ -65,13 +69,13 @@ export async function POST(request: NextRequest) {
     await getOrCreateUser(userId, "", "");
 
     // Atomically credit wallet balance and record the transaction
-    await db.transaction(async (tx) => {
-      await tx
+    await db.transaction(async (trx) => {
+      await trx
         .update(users)
         .set({ walletBalance: sql`wallet_balance + ${depositedLamports}` })
         .where(eq(users.id, userId));
 
-      await tx.insert(walletTransactions).values({
+      await trx.insert(walletTransactions).values({
         userId,
         amount: depositedLamports,
         type: "deposit",

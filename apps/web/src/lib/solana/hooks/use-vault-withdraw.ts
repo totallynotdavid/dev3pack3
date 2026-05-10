@@ -4,13 +4,14 @@ import { useCallback } from "react";
 import { useSendTransaction } from "./use-send-transaction";
 import { useWallet } from "../wallet/context";
 import { getVaultPda, buildWithdrawInstruction } from "../vault/client";
+import { parseApiErrorMessage } from "../wallet-sync-boundary";
 import { toast } from "sonner";
 
 export function useVaultWithdraw() {
   const { send, isSending } = useSendTransaction();
   const { wallet } = useWallet();
 
-  const withdraw = useCallback(async () => {
+  const withdraw = useCallback(async (): Promise<void> => {
     if (!wallet) {
       toast.error("Wallet not connected");
       return;
@@ -29,12 +30,11 @@ export function useVaultWithdraw() {
     });
 
     if (!res.ok) {
-      const { error } = (await res.json()) as { error: string };
-      throw new Error(error ?? "Failed to record withdrawal");
+      const errorBody = await res.json();
+      throw new Error(parseApiErrorMessage(errorBody, "Failed to record withdrawal"));
     }
 
     toast.success("SOL withdrawn from vault");
-    return signature;
   }, [wallet, send]);
 
   return { withdraw, isWithdrawing: isSending };

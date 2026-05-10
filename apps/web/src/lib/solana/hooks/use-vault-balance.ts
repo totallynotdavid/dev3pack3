@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import useSWR from "swr";
-import { type Address, type Lamports } from "@solana/kit";
+import { type Address } from "@solana/kit";
 import { getVaultPda } from "../vault/client";
 import { useCluster } from "../cluster-context";
 import { useSolanaClient } from "../solana-client-context";
@@ -22,7 +22,8 @@ export function useVaultBalance(userAddress?: Address) {
   );
 
   useEffect(() => {
-    if (!userAddress || !client) return;
+    const noopCleanup = () => {};
+    if (!userAddress || !client) return noopCleanup;
 
     const abortController = new AbortController();
 
@@ -34,7 +35,7 @@ export function useVaultBalance(userAddress?: Address) {
           .subscribe({ abortSignal: abortController.signal });
 
         for await (const notification of notifications) {
-          mutate(notification.value.lamports, { revalidate: false });
+          void mutate(notification.value.lamports, { revalidate: false });
         }
       } catch {
         // SWR polling remains as fallback
@@ -42,11 +43,12 @@ export function useVaultBalance(userAddress?: Address) {
     };
 
     void subscribe();
-    return () => abortController.abort();
+    const cleanup = () => abortController.abort();
+    return cleanup;
   }, [userAddress, client, mutate]);
 
   return {
-    lamports: (data ?? null) as Lamports | null,
+    lamports: data ?? null,
     isLoading,
     error,
     mutate,

@@ -33,7 +33,7 @@ export function useSendTransaction() {
       setIsSending(true);
       try {
         const result = await txClient.sendTransaction([...instructions]);
-        mutate((key: unknown) => Array.isArray(key) && key[0] === "balance");
+        void mutate((key: unknown) => Array.isArray(key) && key[0] === "balance");
         return result.context.signature;
       } finally {
         setIsSending(false);
