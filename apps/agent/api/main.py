@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import os
 import re
+import logging
 
 from fastapi import FastAPI, HTTPException
 from google.adk.runners import Runner
@@ -14,6 +15,9 @@ from google.genai.types import Content, Part
 from pydantic import BaseModel
 
 from factor_bridge_agent.agent import root_agent
+from factor_bridge_agent.model_config import ModelConfig
+
+logger = logging.getLogger(__name__)
 
 AGENT_NAME = "factor_bridge"
 AGENT_VERSION = "0.1.0"
@@ -30,6 +34,17 @@ runner = Runner(
     app_name=AGENT_NAME,
     session_service=session_service,
 )
+
+
+@app.on_event("startup")
+async def startup_event():
+    try:
+        provider_name = os.getenv("MODEL_PROVIDER", "openrouter")
+        config = ModelConfig(provider=provider_name)
+        logger.info(f"[FactorBridge] Configuracion validada: proveedor={config.provider}")
+    except ValueError as e:
+        logger.error(f"[FactorBridge] Error de configuracion: {e}")
+        raise RuntimeError(f"Agent startup failed: {e}") from e
 
 # Patron para detectar razonamiento interno de modelos tipo ReAct
 _COT_LINE = re.compile(
@@ -93,8 +108,8 @@ async def query_agent(request: QueryRequest):
             user_id=request.user_id,
             session_id=request.session_id,
         )
-    except Exception:
-        pass
+    except Exception as e:
+        logger.debug(f"Session creation warning for {request.session_id}: {e}")
 
     user_message = Content(role="user", parts=[Part(text=request.message)])
 
