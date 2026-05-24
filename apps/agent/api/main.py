@@ -9,6 +9,7 @@ import re
 import logging
 
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService
 from google.genai.types import Content, Part
@@ -26,6 +27,19 @@ app = FastAPI(
     title="FactorBridge Agent",
     description="Agente intermediario bilateral de factoring para Peru — powered by Google ADK",
     version=AGENT_VERSION,
+)
+
+# Configurar CORS para permitir peticiones desde el frontend
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "https://ml-agents-sigma.vercel.app",
+        "http://localhost:4200",
+        "http://localhost:3000",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 session_service = InMemorySessionService()
